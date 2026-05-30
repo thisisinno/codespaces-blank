@@ -25,7 +25,7 @@
         {% csrf_token %}
         <main>
             {% if is_edit_mode %}
-                <div class="edit-mode-badge shadow-sm">{{ content.edit_mode_badge|default:"EDIT MODE ACTIVE" }}</div>
+                <div class="edit-mode-badge shadow-sm editable" data-key="edit_mode_badge">{{ content.edit_mode_badge|default:"EDIT MODE ACTIVE" }}</div>
             {% endif %}
 
             <nav class="navbar navbar-expand-lg">
@@ -40,9 +40,9 @@
 
                     <div class="d-lg-none ms-auto me-3">
                         {% if user.is_authenticated %}
-                            <a class="btn custom-btn custom-border-btn" href="{% url 'logout' %}">{{ content.logout_button|default:"Logout" }}</a>
+                            <a class="btn custom-btn custom-border-btn editable" href="{% url 'logout' %}" data-key="logout_button">{{ content.logout_button|default:"Logout" }}</a>
                         {% else %}
-                            <a class="btn custom-btn custom-border-btn" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample">
+                            <a class="btn custom-btn custom-border-btn editable" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample" data-key="login_button">
                                 {{ content.login_button|default:"Admin Login" }}
                             </a>
                         {% endif %}
@@ -62,16 +62,16 @@
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle editable" href="#" id="navbarLightDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-key="nav_pages">{{ content.nav_pages|default:"Pages" }}</a>
                                 <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="navbarLightDropdownMenuLink">
-                                    <li><a class="dropdown-item" href="{% url 'list' %}">{{ content.nav_event_listing|default:"Event Listing" }}</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'details' %}">{{ content.nav_event_detail|default:"Event Detail" }}</a></li>
+                                    <li><a class="dropdown-item editable" href="{% url 'list' %}" data-key="nav_event_listing">{{ content.nav_event_listing|default:"Event Listing" }}</a></li>
+                                    <li><a class="dropdown-item editable" href="{% url 'details' %}" data-key="nav_event_detail">{{ content.nav_event_detail|default:"Event Detail" }}</a></li>
                                 </ul>
                             </li>
                         </ul>
                         <div class="d-none d-lg-block ms-lg-3">
                             {% if user.is_authenticated %}
-                                <a class="btn custom-btn custom-border-btn" href="{% url 'logout' %}">{{ content.logout_button|default:"Logout" }}</a>
+                                <a class="btn custom-btn custom-border-btn editable" href="{% url 'logout' %}" data-key="logout_button">{{ content.logout_button|default:"Logout" }}</a>
                             {% else %}
-                                <a class="btn custom-btn custom-border-btn" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample">{{ content.login_button|default:"Admin Login" }}</a>
+                                <a class="btn custom-btn custom-border-btn editable" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample" data-key="login_button">{{ content.login_button|default:"Admin Login" }}</a>
                             {% endif %}
                         </div>
                     </div>
@@ -143,7 +143,7 @@
                                 {% elif media.hero_video.video_url %}
                                     <video controls class="w-100 h-100 object-fit-cover"><source src="{{ media.hero_video.video_url }}"></video>
                                 {% else %}
-                                    <div class="d-flex justify-content-center align-items-center bg-dark text-white rounded">{{ content.hero_video_placeholder|default:"No video selected" }}</div>
+                                    <div class="d-flex justify-content-center align-items-center bg-dark text-white rounded"><span class="editable" data-key="hero_video_placeholder">{{ content.hero_video_placeholder|default:"No video selected" }}</span></div>
                                 {% endif %}
                             </div>
                         </div>
@@ -200,9 +200,12 @@
                                 <form action="#" method="get" class="custom-form mt-lg-4 mt-2" role="form">
                                     <div class="input-group input-group-lg">
                                         <span class="input-group-text bi-envelope" id="basic-addon1"></span>
-                                        <input type="email" name="email" class="form-control" placeholder="{{ content.newsletter_placeholder|default:'Email address' }}" required>
+                                        <input type="email" name="email" class="form-control" placeholder="{{ content.newsletter_placeholder|default:'Email address' }}" data-placeholder-key="newsletter_placeholder" required>
                                         <button type="submit" class="form-control editable" data-key="newsletter_button">{{ content.newsletter_button|default:"Subscribe" }}</button>
                                     </div>
+                                    {% if is_edit_mode %}
+                                        <small class="editable cms-placeholder-helper" data-key="newsletter_placeholder">{{ content.newsletter_placeholder|default:"Email address" }}</small>
+                                    {% endif %}
                                 </form>
                             </div>
                         </div>
@@ -218,12 +221,14 @@
                             <h2 class="editable" data-key="testimony_section_title">{{ content.testimony_section_title|default:"What Our Customers Say" }}</h2>
                             <p class="editable mb-0" data-key="testimony_section_subtitle">{{ content.testimony_section_subtitle|default:"Real feedback from people who trust our services." }}</p>
                         </div>
-                        <div class="col-lg-4 col-md-6 col-12 mb-4">
-                            <div class="testimony-card h-100">
+                    </div>
+                    <div class="row g-4 justify-content-center align-items-stretch">
+                        <div class="col-lg-4 col-md-6 col-12">
+                            <div class="testimony-card">
                                 <img src="{% firstof media.testimony_one_image.image_url founder_fallback %}" class="testimony-image img-fluid editable-image" alt="Customer testimonial" data-key="testimony_one_image">
                                 <h4 class="mt-4 mb-2 editable" data-key="testimony_one_name">{{ content.testimony_one_name|default:"Customer Name" }}</h4>
                                 <a href="{{ testimony_links.one }}" target="_blank" rel="noopener" class="testimony-whatsapp-link" data-url-key="testimony_one_whatsapp_url">
-                                    <i class="bi-whatsapp me-2"></i><span class="editable" data-key="testimony_one_contact_label">{{ content.testimony_one_contact_label|default:"Chat on WhatsApp" }}</span>
+                                    <i class="bi-whatsapp"></i><span class="editable" data-key="testimony_one_contact_label">{{ content.testimony_one_contact_label|default:"Chat on WhatsApp" }}</span>
                                 </a>
                                 {% if is_edit_mode %}
                                     <small class="testimony-url editable" data-key="testimony_one_whatsapp_url">{{ content.testimony_one_whatsapp_url|default:"https://wa.me/255700000000" }}</small>
@@ -235,12 +240,12 @@
                                 <small class="testimony-rating editable" data-key="testimony_one_rating">{{ content.testimony_one_rating|default:"Rated 5/5" }}</small>
                             </div>
                         </div>
-                        <div class="col-lg-4 col-md-6 col-12 mb-4">
-                            <div class="testimony-card h-100">
+                        <div class="col-lg-4 col-md-6 col-12">
+                            <div class="testimony-card">
                                 <img src="{% firstof media.testimony_two_image.image_url cofounder_fallback %}" class="testimony-image img-fluid editable-image" alt="Customer testimonial" data-key="testimony_two_image">
                                 <h4 class="mt-4 mb-2 editable" data-key="testimony_two_name">{{ content.testimony_two_name|default:"Customer Name" }}</h4>
                                 <a href="{{ testimony_links.two }}" target="_blank" rel="noopener" class="testimony-whatsapp-link" data-url-key="testimony_two_whatsapp_url">
-                                    <i class="bi-whatsapp me-2"></i><span class="editable" data-key="testimony_two_contact_label">{{ content.testimony_two_contact_label|default:"Chat on WhatsApp" }}</span>
+                                    <i class="bi-whatsapp"></i><span class="editable" data-key="testimony_two_contact_label">{{ content.testimony_two_contact_label|default:"Chat on WhatsApp" }}</span>
                                 </a>
                                 {% if is_edit_mode %}
                                     <small class="testimony-url editable" data-key="testimony_two_whatsapp_url">{{ content.testimony_two_whatsapp_url|default:"https://wa.me/255700000001" }}</small>
@@ -252,12 +257,12 @@
                                 <small class="testimony-rating editable" data-key="testimony_two_rating">{{ content.testimony_two_rating|default:"Rated 5/5" }}</small>
                             </div>
                         </div>
-                        <div class="col-lg-4 col-md-6 col-12 mb-4">
-                            <div class="testimony-card h-100">
+                        <div class="col-lg-4 col-md-6 col-12">
+                            <div class="testimony-card">
                                 <img src="{% firstof media.testimony_three_image.image_url founder_fallback %}" class="testimony-image img-fluid editable-image" alt="Customer testimonial" data-key="testimony_three_image">
                                 <h4 class="mt-4 mb-2 editable" data-key="testimony_three_name">{{ content.testimony_three_name|default:"Customer Name" }}</h4>
                                 <a href="{{ testimony_links.three }}" target="_blank" rel="noopener" class="testimony-whatsapp-link" data-url-key="testimony_three_whatsapp_url">
-                                    <i class="bi-whatsapp me-2"></i><span class="editable" data-key="testimony_three_contact_label">{{ content.testimony_three_contact_label|default:"Chat on WhatsApp" }}</span>
+                                    <i class="bi-whatsapp"></i><span class="editable" data-key="testimony_three_contact_label">{{ content.testimony_three_contact_label|default:"Chat on WhatsApp" }}</span>
                                 </a>
                                 {% if is_edit_mode %}
                                     <small class="testimony-url editable" data-key="testimony_three_whatsapp_url">{{ content.testimony_three_whatsapp_url|default:"https://wa.me/255700000002" }}</small>
@@ -341,9 +346,9 @@
                             <form action="#" method="post" class="custom-form contact-form" role="form">
                                 <h2 class="mb-4 pb-2 editable" data-key="contact_title">{{ content.contact_title|default:"Contact Us" }}</h2>
                                 <div class="row">
-                                    <div class="col-lg-6 col-md-6 col-12"><div class="form-floating"><input type="text" class="form-control" placeholder="{{ content.contact_name_label|default:'Full Name' }}" required><label class="editable" data-key="contact_name_label">{{ content.contact_name_label|default:"Full Name" }}</label></div></div>
-                                    <div class="col-lg-6 col-md-6 col-12"><div class="form-floating"><input type="email" class="form-control" placeholder="{{ content.contact_email_label|default:'Email address' }}" required><label class="editable" data-key="contact_email_label">{{ content.contact_email_label|default:"Email address" }}</label></div></div>
-                                    <div class="col-lg-12 col-12"><div class="form-floating"><textarea class="form-control" placeholder="{{ content.contact_message_label|default:'Message' }}"></textarea><label class="editable" data-key="contact_message_label">{{ content.contact_message_label|default:"Message" }}</label></div><button type="submit" class="form-control editable" data-key="contact_submit">{{ content.contact_submit|default:"Submit Form" }}</button></div>
+                                    <div class="col-lg-6 col-md-6 col-12"><div class="form-floating"><input type="text" class="form-control" placeholder="{{ content.contact_name_label|default:'Full Name' }}" data-placeholder-key="contact_name_label" required><label class="editable" data-key="contact_name_label">{{ content.contact_name_label|default:"Full Name" }}</label></div></div>
+                                    <div class="col-lg-6 col-md-6 col-12"><div class="form-floating"><input type="email" class="form-control" placeholder="{{ content.contact_email_label|default:'Email address' }}" data-placeholder-key="contact_email_label" required><label class="editable" data-key="contact_email_label">{{ content.contact_email_label|default:"Email address" }}</label></div></div>
+                                    <div class="col-lg-12 col-12"><div class="form-floating"><textarea class="form-control" placeholder="{{ content.contact_message_label|default:'Message' }}" data-placeholder-key="contact_message_label"></textarea><label class="editable" data-key="contact_message_label">{{ content.contact_message_label|default:"Message" }}</label></div><button type="submit" class="form-control editable" data-key="contact_submit">{{ content.contact_submit|default:"Submit Form" }}</button></div>
                                 </div>
                             </form>
                         </div>
@@ -392,7 +397,7 @@
                                     <a href="{{ social.url|default:'#' }}" class="social-icon-link {{ social.icon_class|default:'bi-link-45deg' }} editable-link" data-social-id="{{ social.id }}" data-name="{{ social.name|default:'' }}" data-url="{{ social.url|default:'' }}" data-icon="{{ social.icon_class|default:'' }}" title="{{ social.name|default:'' }}"></a>
                                 </li>
                             {% empty %}
-                                <li class="text-white">{{ content.social_empty|default:"No social links configured." }}</li>
+                                <li class="text-white editable" data-key="social_empty">{{ content.social_empty|default:"No social links configured." }}</li>
                             {% endfor %}
                         </ul>
                         <p class="copyright-text editable" data-key="footer_credit">{{ content.footer_credit|default:"Design: TemplateMo. Distributed by ThemeWagon" }}</p>

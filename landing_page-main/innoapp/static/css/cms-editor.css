@@ -39,3 +39,10 @@ body[data-is-staff="true"] .editable-link:hover {
 .cms-context-menu .dropdown-item {
     border-radius: 0.5rem;
 }
+
+.cms-placeholder-helper {
+    display: inline-block;
+    margin-top: 0.5rem;
+    color: #fff;
+    opacity: 0.9;
+}

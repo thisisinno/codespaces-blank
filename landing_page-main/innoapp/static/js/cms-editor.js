@@ -17,8 +17,10 @@
     const textEditorModal = new bootstrap.Modal(document.getElementById('textEditorModal'));
     const videoEditorModal = new bootstrap.Modal(document.getElementById('videoEditorModal'));
     const linkEditorModal = new bootstrap.Modal(document.getElementById('linkEditorModal'));
+    const editableSelector = '.editable, .editable-image, .editable-video, .editable-link';
 
     let currentTarget = null;
+    let linkClickTimer = null;
 
     const getCookie = (name) => {
         const cookie = document.cookie
@@ -30,6 +32,9 @@
 
     const showToast = (message, mode = 'success') => {
         if (!toastEl) {
+            if (mode === 'error') {
+                console.error(message);
+            }
             return;
         }
         toastEl.classList.remove('text-bg-success', 'text-bg-danger');
@@ -38,12 +43,22 @@
         toast.show();
     };
 
+    const handleError = (error, fallbackMessage = 'Something went wrong. Please try again.') => {
+        const message = error?.message || fallbackMessage;
+        console.error('[CMS editor]', error);
+        showToast(message, 'error');
+    };
+
     const request = async (url, options = {}) => {
-        const headers = options.headers || {};
+        const headers = { ...(options.headers || {}) };
         headers['X-CSRFToken'] = getCookie('csrftoken');
-        options.headers = headers;
-        const response = await fetch(url, options);
-        const data = await response.json();
+        const response = await fetch(url, { ...options, headers });
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (error) {
+            throw new Error('The server returned an unreadable response.');
+        }
         if (!response.ok) {
             throw new Error(data.error || 'Request failed');
         }
@@ -51,16 +66,79 @@
     };
 
     const hideMenu = () => contextMenu.classList.remove('show');
+    const escapeSelector = (value) => window.CSS?.escape ? CSS.escape(value) : value.replace(/"/g, '\\"');
+
+    const getTargetType = (target) => {
+        if (!target) {
+            return '';
+        }
+        if (target.dataset.socialId || target.classList.contains('editable-link')) {
+            return 'link';
+        }
+        if (target.classList.contains('editable-image')) {
+            return 'image';
+        }
+        if (target.classList.contains('editable-video')) {
+            return 'video';
+        }
+        if (target.classList.contains('editable')) {
+            return 'text';
+        }
+        return '';
+    };
+
+    const openTextEditor = (target) => {
+        currentTarget = target;
+        textEditorInput.value = target.dataset.display === 'pipe-list'
+            ? Array.from(target.querySelectorAll('b')).map((item) => item.textContent.trim()).join('|')
+            : target.textContent.trim();
+        textEditorModal.show();
+    };
+
+    const openImageEditor = (target) => {
+        currentTarget = target;
+        imageInput.value = '';
+        imageInput.click();
+    };
+
+    const openVideoEditor = (target) => {
+        currentTarget = target;
+        videoFileInput.value = '';
+        youtubeUrlInput.value = '';
+        videoEditorModal.show();
+    };
+
+    const openSocialLinkEditor = (target) => {
+        currentTarget = target;
+        socialNameInput.value = target.dataset.name || '';
+        socialUrlInput.value = target.dataset.url || '';
+        socialIconInput.value = target.dataset.icon || '';
+        linkEditorModal.show();
+    };
+
+    const runEditorAction = (action, target) => {
+        if (!target) {
+            showToast('Choose editable content first.', 'error');
+            return;
+        }
+
+        const actions = {
+            'edit-text': openTextEditor,
+            'change-image': openImageEditor,
+            'change-video': openVideoEditor,
+            'edit-link': openSocialLinkEditor,
+        };
+        const handler = actions[action];
+        if (!handler) {
+            showToast('That editor action is not available.', 'error');
+            return;
+        }
+        handler(target);
+    };
 
     const openMenu = (event, target) => {
         currentTarget = target;
-        const targetType = target.dataset.socialId
-            ? 'link'
-            : target.classList.contains('editable-image')
-              ? 'image'
-              : target.classList.contains('editable-video')
-                ? 'video'
-                : 'text';
+        const targetType = getTargetType(target);
 
         contextMenu.querySelectorAll('[data-action]').forEach((button) => {
             button.style.display = 'none';
@@ -85,7 +163,7 @@
     };
 
     document.addEventListener('contextmenu', (event) => {
-        const target = event.target.closest('.editable, .editable-image, .editable-video, .editable-link');
+        const target = event.target.closest(editableSelector);
         if (!target) {
             hideMenu();
             return;
@@ -94,6 +172,51 @@
         openMenu(event, target);
     });
 
+    document.addEventListener('dblclick', (event) => {
+        const target = event.target.closest(editableSelector);
+        if (!target) {
+            return;
+        }
+        clearTimeout(linkClickTimer);
+        event.preventDefault();
+        event.stopPropagation();
+
+        const targetType = getTargetType(target);
+        const actionByType = {
+            text: 'edit-text',
+            image: 'change-image',
+            video: 'change-video',
+            link: 'edit-link',
+        };
+        hideMenu();
+        runEditorAction(actionByType[targetType], target);
+    });
+
+    document.addEventListener('click', (event) => {
+        const editableTarget = event.target.closest(editableSelector);
+        const editableLink = editableTarget?.closest('a');
+        if (!editableLink || editableLink.dataset.bsToggle) {
+            return;
+        }
+
+        if (event.detail > 1) {
+            clearTimeout(linkClickTimer);
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        clearTimeout(linkClickTimer);
+        linkClickTimer = window.setTimeout(() => {
+            const href = editableLink.getAttribute('href');
+            if (href && href !== '#') {
+                window.location.href = href;
+            }
+        }, 250);
+    }, true);
+
     document.addEventListener('click', hideMenu);
 
     contextMenu.addEventListener('click', (event) => {
@@ -101,30 +224,8 @@
         if (!action || !currentTarget) {
             return;
         }
-
-        if (action === 'edit-text') {
-            textEditorInput.value = currentTarget.dataset.display === 'pipe-list'
-                ? Array.from(currentTarget.querySelectorAll('b')).map((item) => item.textContent.trim()).join('|')
-                : currentTarget.textContent.trim();
-            textEditorModal.show();
-        }
-
-        if (action === 'change-image') {
-            imageInput.click();
-        }
-
-        if (action === 'change-video') {
-            videoFileInput.value = '';
-            youtubeUrlInput.value = '';
-            videoEditorModal.show();
-        }
-
-        if (action === 'edit-link') {
-            socialNameInput.value = currentTarget.dataset.name || '';
-            socialUrlInput.value = currentTarget.dataset.url || '';
-            socialIconInput.value = currentTarget.dataset.icon || '';
-            linkEditorModal.show();
-        }
+        hideMenu();
+        runEditorAction(action, currentTarget);
     });
 
     document.getElementById('saveTextButton').addEventListener('click', async () => {
@@ -138,13 +239,18 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ key, content: textEditorInput.value }),
             });
-            if (currentTarget.dataset.display === 'pipe-list') {
-                const words = data.content.split('|').map((item) => item.trim()).filter(Boolean);
-                currentTarget.innerHTML = words.map((word, index) => `<b class="${index === 0 ? 'is-visible' : ''}">${word}</b>`).join('');
-            } else {
-                currentTarget.textContent = data.content;
-            }
-            document.querySelectorAll(`[data-url-key="${key}"]`).forEach((link) => {
+            document.querySelectorAll(`.editable[data-key="${escapeSelector(key)}"]`).forEach((element) => {
+                if (element.dataset.display === 'pipe-list') {
+                    const words = data.content.split('|').map((item) => item.trim()).filter(Boolean);
+                    element.innerHTML = words.map((word, index) => `<b class="${index === 0 ? 'is-visible' : ''}">${word}</b>`).join('');
+                } else {
+                    element.textContent = data.content;
+                }
+            });
+            document.querySelectorAll(`[data-placeholder-key="${escapeSelector(key)}"]`).forEach((field) => {
+                field.placeholder = data.content;
+            });
+            document.querySelectorAll(`[data-url-key="${escapeSelector(key)}"]`).forEach((link) => {
                 if (/^https?:\/\//i.test(data.content.trim())) {
                     link.href = data.content.trim();
                 }
@@ -152,7 +258,7 @@
             textEditorModal.hide();
             showToast('Saved successfully');
         } catch (error) {
-            showToast(error.message, 'error');
+            handleError(error, 'Text could not be saved.');
         }
     });
 
@@ -170,7 +276,7 @@
             });
             showToast('Saved successfully');
         } catch (error) {
-            showToast(error.message, 'error');
+            handleError(error, 'Image could not be saved.');
         }
     });
 
@@ -199,7 +305,7 @@
             videoEditorModal.hide();
             showToast('Saved successfully');
         } catch (error) {
-            showToast(error.message, 'error');
+            handleError(error, 'Video could not be saved.');
         }
     });
 
@@ -227,7 +333,7 @@
             linkEditorModal.hide();
             showToast('Saved successfully');
         } catch (error) {
-            showToast(error.message, 'error');
+            handleError(error, 'Social link could not be saved.');
         }
     });
 })();
