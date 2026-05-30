@@ -990,6 +990,72 @@ strong {
 
 
 /*---------------------------------------
+  TESTIMONY SECTION
+-----------------------------------------*/
+.testimony-section {
+  background-color: var(--white-color);
+}
+
+.testimony-card {
+  background-color: var(--section-bg-color);
+  border-radius: var(--border-radius-medium);
+  box-shadow: 0 1rem 2.5rem rgba(61, 64, 91, 0.12);
+  padding: 35px 30px;
+  text-align: center;
+}
+
+.testimony-image {
+  border: 5px solid var(--white-color);
+  border-radius: var(--border-radius-large);
+  box-shadow: 0 0.5rem 1.5rem rgba(61, 64, 91, 0.15);
+  height: 110px;
+  object-fit: cover;
+  width: 110px;
+}
+
+.testimony-whatsapp-link {
+  background-color: var(--primary-color);
+  border-radius: var(--border-radius-large);
+  color: var(--white-color);
+  font-size: var(--btn-font-size);
+  font-weight: var(--font-weight-bold);
+  margin: 10px 0 16px;
+  padding: 10px 18px;
+}
+
+.testimony-whatsapp-link:hover {
+  background-color: var(--secondary-color);
+  color: var(--white-color);
+}
+
+.testimony-url {
+  color: var(--p-color);
+  display: block;
+  font-size: 13px;
+  margin: -6px 0 16px;
+  overflow-wrap: anywhere;
+}
+
+.testimony-text {
+  margin-bottom: 20px;
+}
+
+.testimony-stars {
+  color: var(--custom-btn-bg-color);
+  font-size: var(--h5-font-size);
+  letter-spacing: 2px;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.testimony-rating {
+  color: var(--secondary-color);
+  display: block;
+  font-weight: var(--font-weight-bold);
+}
+
+
+/*---------------------------------------
   CONTACT               
 -----------------------------------------*/
 .contact-form .form-floating>textarea {
@@ -1286,4 +1352,3 @@ strong {
     padding: 4px 12px;
   }
 }
-

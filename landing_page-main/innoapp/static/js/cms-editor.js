@@ -144,6 +144,11 @@
             } else {
                 currentTarget.textContent = data.content;
             }
+            document.querySelectorAll(`[data-url-key="${key}"]`).forEach((link) => {
+                if (/^https?:\/\//i.test(data.content.trim())) {
+                    link.href = data.content.trim();
+                }
+            });
             textEditorModal.hide();
             showToast('Saved successfully');
         } catch (error) {

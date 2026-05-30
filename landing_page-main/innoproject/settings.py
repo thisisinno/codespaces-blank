@@ -27,7 +27,23 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# CSRF settings
+CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to access CSRF cookie
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.app.github.dev',  # Allow all GitHub Codespaces domains
+    'https://localhost:8000',
+    'https://localhost:6379',
+    'https://localhost:9000',
+]
 
+# CORS settings (if using django-cors-headers)
+CORS_ALLOWED_ORIGINS = [
+    'https://*.app.github.dev',  # Allow all GitHub Codespaces domains
+    'https://localhost:8000',
+    'https://localhost:9000',
+    'https://localhost:6379',
+]
 # Application definition
 
 INSTALLED_APPS = [

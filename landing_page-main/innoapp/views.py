@@ -13,12 +13,12 @@ from .models import MediaContent, PageContent, SocialLink
 
 
 DEFAULT_PAGE_CONTENT = {
-    "site_brand": "Tiya",
-    "site_tagline": "Golf Club",
+    "site_brand": "Your Brand",
+    "site_tagline": "Your Tagline",
     "nav_home": "Home",
     "nav_about": "About",
-    "nav_membership": "Membership",
-    "nav_events": "Events",
+    "nav_membership": "Testimonials",
+    "nav_events": "Latest Updates",
     "nav_contact": "Contact Us",
     "nav_pages": "Pages",
     "login_button": "Admin Login",
@@ -28,11 +28,94 @@ DEFAULT_PAGE_CONTENT = {
     "login_password_label": "Password",
     "login_submit": "Login",
     "login_footer_label": "Need help?",
+    "login_footer_value": "support@example.com",
+    "hero_welcome": "Welcome to Our Website",
+    "hero_title_prefix": "We are",
+    "hero_rotating_words": "Reliable|Professional|Trusted",
+    "hero_story_cta": "Our Story",
+    "hero_member_cta": "Read Testimonials",
+    "about_section_title": "About Us",
+    "about_history_title": "Who We Are",
+    "about_history_body": "Write a short description about your company, mission, and services here.",
+    "about_history_body_two": "Use this area to explain why customers should trust your business.",
+    "founder_name": "Team Member Name",
+    "founder_role": "Founder / Manager",
+    "cofounder_name": "Team Member Name",
+    "cofounder_role": "Operations Lead",
+    "newsletter_title": "Get our newsletter",
+    "newsletter_body": "Enter a short message encouraging visitors to subscribe or contact you.",
+    "newsletter_placeholder": "Email address",
+    "newsletter_button": "Subscribe",
+    "testimony_section_title": "What Our Customers Say",
+    "testimony_section_subtitle": "Real feedback from people who trust our services.",
+    "testimony_one_name": "Customer Name",
+    "testimony_one_contact_label": "Chat on WhatsApp",
+    "testimony_one_whatsapp_url": "https://wa.me/255700000000",
+    "testimony_one_text": "Write the customer testimonial here. Explain the experience, service quality, and result.",
+    "testimony_one_rating": "Rated 5/5",
+    "testimony_two_name": "Customer Name",
+    "testimony_two_contact_label": "Chat on WhatsApp",
+    "testimony_two_whatsapp_url": "https://wa.me/255700000001",
+    "testimony_two_text": "Share another customer story here so visitors can understand the value you provide.",
+    "testimony_two_rating": "Rated 5/5",
+    "testimony_three_name": "Customer Name",
+    "testimony_three_contact_label": "Chat on WhatsApp",
+    "testimony_three_whatsapp_url": "https://wa.me/255700000002",
+    "testimony_three_text": "Use this testimonial to highlight reliability, support, or a successful outcome.",
+    "testimony_three_rating": "Rated 5/5",
+    "events_title": "Latest Updates",
+    "event_one_day": "24",
+    "event_one_month": "Jan 2026",
+    "event_one_title": "Service Update",
+    "event_one_body": "Write a short update about your latest service, offer, announcement, or business news.",
+    "event_one_location_label": "Location:",
+    "event_one_location": "Your business location",
+    "event_one_ticket_label": "Info:",
+    "event_one_ticket": "Contact us",
+    "event_one_button": "Learn More",
+    "event_two_day": "28",
+    "event_two_month": "Jan 2026",
+    "event_two_title": "Customer Announcement",
+    "event_two_body": "Use this area to share another update, featured service, or useful message for customers.",
+    "event_two_location_label": "Location:",
+    "event_two_location": "Your business location",
+    "event_two_ticket_label": "Info:",
+    "event_two_ticket": "Contact us",
+    "event_two_button": "Learn More",
+    "contact_title": "Contact Us",
+    "contact_submit": "Submit Form",
+    "contact_location": "Your business location",
+    "contact_phone": "+255 XXX XXX XXX",
+    "contact_email": "info@example.com",
+    "contact_directions": "Directions",
+    "footer_join_title": "Business Hours",
+    "footer_weekday_label": "Mon-Fri",
+    "footer_weekday_hours": "8:00 AM - 5:00 PM",
+    "footer_weekend_label": "Sat-Sun",
+    "footer_weekend_hours": "Closed",
+    "footer_copyright": "Copyright © 2026 Your Brand",
+    "footer_credit": "Design: TemplateMo. Distributed by ThemeWagon",
+    "edit_mode_badge": "EDIT MODE ACTIVE",
+    "social_section_title": "Follow Us",
+    "logout_button": "Logout",
+    "nav_event_listing": "Event Listing",
+    "nav_event_detail": "Event Detail",
+    "hero_video_placeholder": "No video selected",
+    "contact_name_label": "Full Name",
+    "contact_email_label": "Email address",
+    "contact_message_label": "Message",
+    "social_empty": "No social links configured.",
+}
+
+LEGACY_DEFAULT_PAGE_CONTENT = {
+    "site_brand": "Tiya",
+    "site_tagline": "Golf Club",
+    "nav_membership": "Membership",
+    "nav_events": "Events",
     "login_footer_value": "contact@tiyaclub.com",
     "hero_welcome": "Welcome to the club",
     "hero_title_prefix": "Tiya is",
     "hero_rotating_words": "Modern|Creative|Lifestyle",
-    "hero_story_cta": "Our Story",
     "hero_member_cta": "Become a member",
     "about_section_title": "About Tiya",
     "about_history_title": "Tiya Club History",
@@ -42,70 +125,30 @@ DEFAULT_PAGE_CONTENT = {
     "founder_role": "Founder",
     "cofounder_name": "Sandy",
     "cofounder_role": "Co-Founder",
-    "newsletter_title": "Get our newsletter",
     "newsletter_body": "Capture emails, refresh promo copy, and swap media directly from the landing page.",
-    "newsletter_placeholder": "Email address",
-    "newsletter_button": "Subscribe",
-    "membership_title": "Membership at Tiya",
-    "membership_fees_title": "Membership Fees",
-    "membership_join_title": "Please join us!",
-    "membership_form_title": "Become a member",
-    "membership_name_placeholder": "Full Name",
-    "membership_email_placeholder": "Email address",
-    "membership_message_placeholder": "Comments",
-    "membership_submit": "Submit",
     "events_title": "Upcoming Events",
-    "event_one_day": "24",
     "event_one_month": "Feb 2048",
     "event_one_title": "Private activities",
     "event_one_body": "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    "event_one_location_label": "Location:",
     "event_one_location": "National Center, NYC",
     "event_one_ticket_label": "Ticket:",
     "event_one_ticket": "$250",
     "event_one_button": "Buy Ticket",
-    "event_two_day": "28",
     "event_two_month": "Feb 2048",
     "event_two_title": "Group tournament activities",
     "event_two_body": "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    "event_two_location_label": "Location:",
     "event_two_location": "National Center, NYC",
     "event_two_ticket_label": "Ticket:",
     "event_two_ticket": "$350",
     "event_two_button": "Buy Ticket",
     "contact_title": "Contact Tiya",
-    "contact_submit": "Submit Form",
     "contact_location": "London, United Kingdom",
     "contact_phone": "(020) 010-020-0340",
     "contact_email": "info@company.com",
-    "contact_directions": "Directions",
     "footer_join_title": "Join Us",
-    "footer_weekday_label": "Mon-Fri",
     "footer_weekday_hours": "6:00 AM - 6:00 PM",
-    "footer_weekend_label": "Sat-Sun",
     "footer_weekend_hours": "6:30 AM - 8:30 PM",
     "footer_copyright": "Copyright © 2048 Tiya Golf Club",
-    "footer_credit": "Design: TemplateMo. Distributed by ThemeWagon",
-    "edit_mode_badge": "EDIT MODE ACTIVE",
-    "social_section_title": "Follow Us",
-    "logout_button": "Logout",
-    "nav_event_listing": "Event Listing",
-    "nav_event_detail": "Event Detail",
-    "hero_video_placeholder": "No video selected",
-    "membership_header_access": "Yearly Access",
-    "membership_header_t1": "T1 $420",
-    "membership_header_t2": "T2 $640",
-    "membership_header_t3": "T3 $860",
-    "membership_row_insurance": "Golf Insurance",
-    "membership_row_facilities": "Club Facilities",
-    "membership_row_country": "Country Club",
-    "membership_row_weekend": "Weekend Seasonal",
-    "membership_row_premium": "Premium Courses",
-    "membership_row_networking": "Pro's Networking",
-    "contact_name_label": "Full Name",
-    "contact_email_label": "Email address",
-    "contact_message_label": "Message",
-    "social_empty": "No social links configured.",
 }
 
 DEFAULT_MEDIA = {
@@ -118,7 +161,17 @@ DEFAULT_SOCIAL_LINKS = [
     {"name": "WhatsApp", "url": "https://whatsapp.com", "icon_class": "bi-whatsapp"},
 ]
 
-IMAGE_KEYS = {"founder_image", "cofounder_image", "event_one_image", "event_two_image", "contact_map", "site_logo"}
+IMAGE_KEYS = {
+    "founder_image",
+    "cofounder_image",
+    "event_one_image",
+    "event_two_image",
+    "contact_map",
+    "site_logo",
+    "testimony_one_image",
+    "testimony_two_image",
+    "testimony_three_image",
+}
 VIDEO_KEYS = {"hero_video"}
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"}
 ALLOWED_VIDEO_TYPES = {"video/mp4", "video/webm", "video/ogg", "video/quicktime"}
@@ -135,6 +188,13 @@ def _youtube_embed_url(url):
     return f"https://www.youtube.com/embed/{video_id}" if video_id else url
 
 
+def _safe_external_url(url, fallback):
+    parsed = urlparse(url or "")
+    if parsed.scheme in {"http", "https"} and parsed.netloc:
+        return url
+    return fallback
+
+
 def _media_payload(instance):
     return {
         "image_url": instance.image.url if instance and instance.image else "",
@@ -146,7 +206,10 @@ def _media_payload(instance):
 
 def _ensure_defaults():
     for key, value in DEFAULT_PAGE_CONTENT.items():
-        PageContent.objects.get_or_create(key=key, defaults={"content": value})
+        item, created = PageContent.objects.get_or_create(key=key, defaults={"content": value})
+        if not created and item.content == LEGACY_DEFAULT_PAGE_CONTENT.get(key):
+            item.content = value
+            item.save(update_fields=["content"])
     for key, value in DEFAULT_MEDIA.items():
         MediaContent.objects.get_or_create(key=key, defaults=value)
     for social in DEFAULT_SOCIAL_LINKS:
@@ -163,12 +226,18 @@ def homepage(request):
     _ensure_defaults()
     content_dict = {item.key: item.content for item in PageContent.objects.all()}
     media_dict = {item.key: _media_payload(item) for item in MediaContent.objects.all()}
+    testimony_links = {
+        "one": _safe_external_url(content_dict.get("testimony_one_whatsapp_url"), DEFAULT_PAGE_CONTENT["testimony_one_whatsapp_url"]),
+        "two": _safe_external_url(content_dict.get("testimony_two_whatsapp_url"), DEFAULT_PAGE_CONTENT["testimony_two_whatsapp_url"]),
+        "three": _safe_external_url(content_dict.get("testimony_three_whatsapp_url"), DEFAULT_PAGE_CONTENT["testimony_three_whatsapp_url"]),
+    }
     context = {
         "content": content_dict,
         "media": media_dict,
         "socials": SocialLink.objects.all().order_by("id"),
         "is_edit_mode": request.user.is_staff,
-        "hero_words": [word.strip() for word in content_dict.get("hero_rotating_words", "Modern|Creative|Lifestyle").split("|") if word.strip()],
+        "testimony_links": testimony_links,
+        "hero_words": [word.strip() for word in content_dict.get("hero_rotating_words", "Reliable|Professional|Trusted").split("|") if word.strip()],
     }
     return render(request, "index.html", context)
 
