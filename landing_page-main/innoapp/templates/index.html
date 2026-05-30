@@ -29,20 +29,89 @@
                     </div>
                 </div>
                 <div class="col-lg-7 col-12">
-                    <div class="hero-video-grid">
-                        {% for video in hero_videos %}
-                            <div class="ratio ratio-16x9 editable-video" data-model="hero_video" data-id="{{ video.id }}" data-field="video">
-                                {% if video.video %}
-                                    <video controls class="w-100 h-100 object-fit-cover" {% if video.poster %}poster="{{ video.poster.url }}"{% endif %}><source src="{{ video.video.url }}"></video>
-                                {% else %}
-                                    <div class="d-flex justify-content-center align-items-center bg-dark text-white rounded h-100">
-                                        <span class="editable" data-model="hero_video" data-id="{{ video.id }}" data-field="title">{{ video.title|default:"Upload a hero video" }}</span>
-                                    </div>
+                    <div class="hero-video-showcase">
+                        <div class="hero-video-showcase-header d-flex align-items-center justify-content-between mb-3">
+                            <div>
+                                <span class="hero-video-eyebrow editable" data-key="hero_video_eyebrow">
+                                    {{ content.hero_video_eyebrow|default:"Featured Videos" }}
+                                </span>
+                                <h3 class="hero-video-heading editable mb-0" data-key="hero_video_heading">
+                                    {{ content.hero_video_heading|default:"Watch Our Work in Action" }}
+                                </h3>
+                            </div>
+
+                            {% if is_edit_mode %}
+                                <button type="button" class="btn custom-btn btn-sm cms-add-video-button" id="addHeroVideoButton">
+                                    <i class="bi-plus-circle me-1"></i>
+                                    Add Videos
+                                </button>
+                            {% endif %}
+                        </div>
+
+                        {% if hero_videos %}
+                            <div id="heroVideoCarousel" class="carousel slide hero-video-carousel editable-video-gallery" data-bs-ride="false" data-key="hero_video_gallery">
+                                <div class="carousel-indicators hero-video-indicators">
+                                    {% for item in hero_videos %}
+                                        <button type="button" data-bs-target="#heroVideoCarousel" data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}" aria-current="{% if forloop.first %}true{% endif %}" aria-label="Video {{ forloop.counter }}"></button>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="carousel-inner">
+                                    {% for item in hero_videos %}
+                                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                            <div class="hero-video-slide editable-video" data-model="hero_video" data-id="{{ item.id }}" data-field="video">
+                                                {% if item.video %}
+                                                    <video class="hero-video-player" controls preload="metadata" playsinline {% if item.poster %}poster="{{ item.poster.url }}"{% endif %}>
+                                                        <source src="{{ item.video.url }}">
+                                                        Your browser does not support the video tag.
+                                                    </video>
+                                                {% else %}
+                                                    <div class="hero-video-empty">
+                                                        <i class="bi-camera-video"></i>
+                                                        <span class="editable" data-model="hero_video" data-id="{{ item.id }}" data-field="title">
+                                                            {{ item.title|default:"Upload a video for this slide" }}
+                                                        </span>
+                                                    </div>
+                                                {% endif %}
+
+                                                <div class="hero-video-caption">
+                                                    <span class="hero-video-count">
+                                                        Video {{ forloop.counter }} / {{ hero_videos|length }}
+                                                    </span>
+                                                    <h4 class="editable" data-model="hero_video" data-id="{{ item.id }}" data-field="title">
+                                                        {{ item.title|default:"Featured Video" }}
+                                                    </h4>
+                                                    {% if is_edit_mode %}
+                                                        <small>Double-click this slide to replace the video file.</small>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                                {% if hero_videos|length > 1 %}
+                                    <button class="carousel-control-prev hero-video-control" type="button" data-bs-target="#heroVideoCarousel" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Previous video</span>
+                                    </button>
+                                    <button class="carousel-control-next hero-video-control" type="button" data-bs-target="#heroVideoCarousel" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Next video</span>
+                                    </button>
                                 {% endif %}
                             </div>
-                        {% empty %}
-                            <div class="ratio ratio-16x9"><div class="d-flex justify-content-center align-items-center bg-dark text-white rounded h-100"><span class="editable" data-key="hero_video_placeholder">{{ content.hero_video_placeholder|default:"No video selected" }}</span></div></div>
-                        {% endfor %}
+                        {% else %}
+                            <div class="hero-video-empty editable-video-gallery" data-key="hero_video_gallery">
+                                <i class="bi-camera-video"></i>
+                                <h4 class="editable" data-key="hero_video_placeholder">
+                                    {{ content.hero_video_placeholder|default:"Upload your first video slide" }}
+                                </h4>
+                                {% if is_edit_mode %}
+                                    <p>Double-click here or use Add Videos to upload one or more video files.</p>
+                                {% endif %}
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

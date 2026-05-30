@@ -7,6 +7,7 @@
     const contextMenu = document.getElementById('cms-context-menu');
     const imageInput = document.getElementById('imageFileInput');
     const videoFileInput = document.getElementById('videoFileInput');
+    const heroVideoFilesInput = document.getElementById('heroVideoFilesInput');
     const textEditorInput = document.getElementById('textEditorInput');
     const socialNameInput = document.getElementById('socialNameInput');
     const socialUrlInput = document.getElementById('socialUrlInput');
@@ -16,7 +17,7 @@
     const textEditorModal = new bootstrap.Modal(document.getElementById('textEditorModal'));
     const videoEditorModal = new bootstrap.Modal(document.getElementById('videoEditorModal'));
     const linkEditorModal = new bootstrap.Modal(document.getElementById('linkEditorModal'));
-    const editableSelector = '.editable, .editable-image, .editable-video, .editable-link';
+    const editableSelector = '.editable, .editable-image, .editable-video, .editable-video-gallery, .editable-link';
 
     let currentTarget = null;
     let linkClickTimer = null;
@@ -86,6 +87,9 @@
         if (target.classList.contains('editable-video')) {
             return 'video';
         }
+        if (target.classList.contains('editable-video-gallery')) {
+            return 'video-gallery';
+        }
         if (target.classList.contains('editable')) {
             return 'text';
         }
@@ -112,6 +116,12 @@
         videoEditorModal.show();
     };
 
+    const openVideoGalleryUploader = (target) => {
+        currentTarget = target || document.querySelector('.editable-video-gallery');
+        heroVideoFilesInput.value = '';
+        heroVideoFilesInput.click();
+    };
+
     const openSocialLinkEditor = (target) => {
         currentTarget = target;
         socialNameInput.value = target.dataset.name || '';
@@ -130,6 +140,7 @@
             'edit-text': openTextEditor,
             'change-image': openImageEditor,
             'change-video': openVideoEditor,
+            'add-videos': openVideoGalleryUploader,
             'edit-link': openSocialLinkEditor,
         };
         const handler = actions[action];
@@ -156,6 +167,9 @@
         }
         if (targetType === 'video') {
             contextMenu.querySelector('[data-action="change-video"]').style.display = 'block';
+        }
+        if (targetType === 'video-gallery') {
+            contextMenu.querySelector('[data-action="add-videos"]').style.display = 'block';
         }
         if (targetType === 'link') {
             contextMenu.querySelector('[data-action="edit-link"]').style.display = 'block';
@@ -190,6 +204,7 @@
             text: 'edit-text',
             image: 'change-image',
             video: 'change-video',
+            'video-gallery': 'add-videos',
             link: 'edit-link',
         };
         hideMenu();
@@ -224,7 +239,7 @@
     document.addEventListener('click', hideMenu);
 
     contextMenu.addEventListener('click', (event) => {
-        const action = event.target.dataset.action;
+        const action = event.target.closest('[data-action]')?.dataset.action;
         if (!action || !currentTarget) {
             return;
         }
@@ -304,6 +319,28 @@
         }
     });
 
+    document.getElementById('addHeroVideoButton')?.addEventListener('click', () => {
+        openVideoGalleryUploader(document.querySelector('.editable-video-gallery'));
+    });
+
+    heroVideoFilesInput?.addEventListener('change', async () => {
+        try {
+            if (!heroVideoFilesInput.files.length) {
+                return;
+            }
+            const formData = new FormData();
+            formData.append('gallery_key', 'hero_video_gallery');
+            Array.from(heroVideoFilesInput.files).forEach((file) => {
+                formData.append('files', file);
+            });
+            const data = await request('/upload-video/', { method: 'POST', body: formData });
+            showToast(`${data.videos.length} video${data.videos.length === 1 ? '' : 's'} added successfully`);
+            window.setTimeout(() => window.location.reload(), 650);
+        } catch (error) {
+            handleError(error, 'Videos could not be added.');
+        }
+    });
+
     document.getElementById('saveVideoButton').addEventListener('click', async () => {
         try {
             if (!currentTarget) {
@@ -320,7 +357,12 @@
                 }
                 formData.append('file', videoFileInput.files[0]);
                 const data = await request('/upload-video/', { method: 'POST', body: formData });
-                currentTarget.innerHTML = `<video controls class="w-100 h-100 object-fit-cover"><source src="${data.video_url}"></video>`;
+                if (currentTarget.classList.contains('hero-video-slide')) {
+                    currentTarget.querySelector('.hero-video-player, .hero-video-empty')?.remove();
+                    currentTarget.insertAdjacentHTML('afterbegin', `<video class="hero-video-player" controls preload="metadata" playsinline><source src="${data.video_url}">Your browser does not support the video tag.</video>`);
+                } else {
+                    currentTarget.innerHTML = `<video controls class="w-100 h-100 object-fit-cover"><source src="${data.video_url}"></video>`;
+                }
             } else {
                 throw new Error('Choose a video file.');
             }

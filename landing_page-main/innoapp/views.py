@@ -34,6 +34,8 @@ DEFAULT_PAGE_CONTENT = {
     "hero_rotating_words": "Websites|Automations|Campaigns",
     "hero_story_cta": "Our Story",
     "hero_member_cta": "Read Client Stories",
+    "hero_video_eyebrow": "Featured Videos",
+    "hero_video_heading": "Watch Our Work in Action",
     "about_section_title": "About InnoWorks Studio",
     "about_history_title": "Strategy, design, and delivery under one roof",
     "about_history_body": "We help service businesses turn outdated websites, scattered tools, and slow manual processes into clear digital systems that customers can trust.",
@@ -536,7 +538,34 @@ def upload_video(request):
     model_name = request.POST.get("model")
     object_id = request.POST.get("id")
     field_name = request.POST.get("field")
+    gallery_key = request.POST.get("gallery_key")
     file = request.FILES.get("file")
+    files = request.FILES.getlist("files")
+    if gallery_key == "hero_video_gallery":
+        uploaded_files = files or ([file] if file else [])
+        if not uploaded_files:
+            return JsonResponse({"error": "Choose at least one video file."}, status=400)
+        if any(item.content_type not in ALLOWED_VIDEO_TYPES for item in uploaded_files):
+            return JsonResponse({"error": "Unsupported video type."}, status=400)
+
+        last_order = HeroVideo.objects.order_by("-sort_order", "-id").values_list("sort_order", flat=True).first() or 0
+        videos = []
+        for index, uploaded_file in enumerate(uploaded_files, start=1):
+            title = uploaded_file.name.rsplit(".", 1)[0].replace("-", " ").replace("_", " ").strip() or "Featured Video"
+            item = HeroVideo.objects.create(
+                title=title[:160],
+                video=uploaded_file,
+                sort_order=last_order + index,
+                is_active=True,
+            )
+            videos.append({
+                "id": item.id,
+                "title": item.title,
+                "video_url": item.video.url,
+                "sort_order": item.sort_order,
+            })
+        return JsonResponse({"success": True, "gallery_key": gallery_key, "videos": videos})
+
     if model_name or object_id or field_name:
         if not file or file.content_type not in ALLOWED_VIDEO_TYPES:
             return JsonResponse({"error": "Unsupported video type."}, status=400)
