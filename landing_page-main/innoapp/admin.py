@@ -1,6 +1,15 @@
 from django.contrib import admin
 
-from .models import EventInsight, HeroVideo, MediaContent, PageContent, SocialLink, Testimonial
+from .models import (
+    CustomerInquiry,
+    EventInsight,
+    GalleryItem,
+    HeroVideo,
+    MediaContent,
+    PageContent,
+    SocialLink,
+    Testimonial,
+)
 
 
 @admin.register(PageContent)
@@ -40,3 +49,21 @@ class EventInsightAdmin(admin.ModelAdmin):
     list_display = ("title", "date_text", "location", "sort_order", "is_featured", "is_active")
     list_editable = ("sort_order", "is_featured", "is_active")
     search_fields = ("title", "summary", "body", "location", "info")
+
+
+@admin.register(GalleryItem)
+class GalleryItemAdmin(admin.ModelAdmin):
+    list_display = ("title", "category", "sort_order", "is_featured", "is_active")
+    list_editable = ("sort_order", "is_featured", "is_active")
+    search_fields = ("title", "subtitle", "description", "category")
+    ordering = ("sort_order", "id")
+
+
+@admin.register(CustomerInquiry)
+class CustomerInquiryAdmin(admin.ModelAdmin):
+    list_display = ("name", "phone", "email", "status", "source", "created_at")
+    list_filter = ("status", "source", "created_at")
+    list_editable = ("status",)
+    search_fields = ("name", "phone", "email", "message")
+    ordering = ("-created_at",)
+    readonly_fields = ("created_at",)

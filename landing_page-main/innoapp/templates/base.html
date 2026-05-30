@@ -7,9 +7,13 @@
         {% csrf_token %}
         <main>
             {% include "partials/navbar.html" %}
+            {% if is_edit_mode %}
+                {% include "partials/admin-inquiries.html" %}
+            {% endif %}
             {% block content %}{% endblock %}
         </main>
         {% include "partials/footer.html" %}
+        {% include "partials/floating-contact.html" %}
         {% include "partials/cms-tools.html" %}
         {% include "partials/scripts.html" %}
     </body>

@@ -1,9 +1,42 @@
 {% load static %}
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="{% firstof content.site_tagline 'Digital Strategy & Growth' %}">
-<meta name="author" content="OpenAI">
+<meta name="description" content="{{ content.seo_default_description|default:content.site_tagline|default:'Digital Strategy & Growth' }}">
+<meta name="keywords" content="{{ content.seo_default_keywords|default:'digital strategy, web design, business website' }}">
+<meta name="author" content="{{ content.seo_author|default:content.site_brand|default:'InnoWorks Studio' }}">
+<meta name="robots" content="{{ content.seo_robots|default:'index, follow' }}">
+<meta name="theme-color" content="{{ content.seo_theme_color|default:'#3D405B' }}">
+<link rel="canonical" href="{{ canonical_url }}">
+<meta property="og:site_name" content="{{ content.seo_site_name|default:content.site_brand|default:'InnoWorks Studio' }}">
+<meta property="og:title" content="{% firstof content.seo_default_title content.site_brand 'InnoWorks Studio' %}">
+<meta property="og:description" content="{{ content.seo_default_description|default:content.site_tagline|default:'Digital Strategy & Growth' }}">
+<meta property="og:type" content="{{ content.seo_og_type|default:'website' }}">
+<meta property="og:url" content="{{ canonical_url }}">
+<meta property="og:image" content="{{ site_url }}{% static 'images/logo.png' %}">
+<meta name="twitter:card" content="{{ content.seo_twitter_card|default:'summary_large_image' }}">
+<meta name="twitter:title" content="{% firstof content.seo_default_title content.site_brand 'InnoWorks Studio' %}">
+<meta name="twitter:description" content="{{ content.seo_default_description|default:content.site_tagline|default:'Digital Strategy & Growth' }}">
+<meta name="twitter:image" content="{{ site_url }}{% static 'images/logo.png' %}">
 <title>{% block title %}{% firstof content.site_brand 'InnoWorks Studio' %}{% endblock %}</title>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "{{ content.site_brand|default:'InnoWorks Studio'|escapejs }}",
+  "url": "{{ site_url|escapejs }}",
+  "email": "{{ content.contact_email|default:'hello@example.com'|escapejs }}",
+  "telephone": "{{ content.contact_phone|default:'+255700123456'|escapejs }}",
+  "address": "{{ content.contact_location|default:'Dar es Salaam, Tanzania'|escapejs }}"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "{{ content.seo_site_name|default:content.site_brand|default:'InnoWorks Studio'|escapejs }}",
+  "url": "{{ site_url|escapejs }}"
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">

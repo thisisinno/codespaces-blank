@@ -1,0 +1,72 @@
+<button type="button"
+        class="floating-contact-button"
+        data-bs-toggle="modal"
+        data-bs-target="#floatingContactModal"
+        aria-label="{{ content.floating_contact_button|default:'Contact Us' }}">
+    <i class="bi-chat-dots-fill"></i>
+    <span class="editable" data-key="floating_contact_button">
+        {{ content.floating_contact_button|default:"Contact Us" }}
+    </span>
+    {% if is_edit_mode and unread_inquiry_count %}
+        <span class="floating-contact-badge">{{ unread_inquiry_count }}</span>
+    {% endif %}
+</button>
+
+<div class="modal fade floating-contact-modal" id="floatingContactModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title editable" data-key="floating_contact_title">
+                        {{ content.floating_contact_title|default:"How can we help?" }}
+                    </h5>
+                    <p class="mb-0 editable" data-key="floating_contact_subtitle">
+                        {{ content.floating_contact_subtitle|default:"Send your details and our team will contact you shortly." }}
+                    </p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form id="floatingContactForm" class="floating-contact-form">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label editable" data-key="floating_contact_name">
+                            {{ content.floating_contact_name|default:"Your Name" }}
+                        </label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label editable" data-key="floating_contact_phone">
+                            {{ content.floating_contact_phone|default:"Phone Number" }}
+                        </label>
+                        <input type="text" name="phone" class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label editable" data-key="floating_contact_email">
+                            {{ content.floating_contact_email|default:"Email Address" }}
+                        </label>
+                        <input type="email" name="email" class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label editable" data-key="floating_contact_message">
+                            {{ content.floating_contact_message|default:"How can we help you?" }}
+                        </label>
+                        <textarea name="message" class="form-control" rows="4" required></textarea>
+                    </div>
+
+                    <div id="floatingContactFeedback" class="small"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn custom-btn editable" data-key="floating_contact_submit">
+                        {{ content.floating_contact_submit|default:"Send Request" }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

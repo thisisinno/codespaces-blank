@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -23,18 +24,24 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-+)5c*f-un0!yr3h3q_3*0#1*r^%4d65((!2_krug0cubgvgp&u"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEBUG", "true").lower() == "true"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,.app.github.dev").split(",")
+    if host.strip()
+]
 
 # CSRF settings
 CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to access CSRF cookie
 CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_TRUSTED_ORIGINS = [
-    'https://*.app.github.dev',  # Allow all GitHub Codespaces domains
-    'https://localhost:8000',
-    'https://localhost:6379',
-    'https://localhost:9000',
+    origin.strip()
+    for origin in os.getenv(
+        "DJANGO_CSRF_TRUSTED_ORIGINS",
+        "https://*.app.github.dev,https://localhost:8000,https://localhost:6379,https://localhost:9000",
+    ).split(",")
+    if origin.strip()
 ]
 
 # CORS settings (if using django-cors-headers)
@@ -60,7 +67,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    # "django.middleware.csrf.CsrfViewMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",

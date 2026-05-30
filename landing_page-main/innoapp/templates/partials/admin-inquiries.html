@@ -1,0 +1,42 @@
+<section class="admin-inquiries-panel">
+    <div class="container">
+        <div class="admin-inquiries-card">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                    <span class="admin-eyebrow">Admin Inbox</span>
+                    <h3 class="mb-0">Customer Inquiries</h3>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-danger">{{ unread_inquiry_count }} new</span>
+                    <a class="btn custom-btn btn-sm" href="/admin/innoapp/customerinquiry/">Open Django Admin</a>
+                </div>
+            </div>
+
+            {% if customer_inquiries %}
+                <div class="admin-inquiries-list mt-4">
+                    {% for inquiry in customer_inquiries %}
+                        <article class="admin-inquiry-item">
+                            <div class="d-flex justify-content-between flex-wrap gap-2">
+                                <strong>{{ inquiry.name }}</strong>
+                                <small>{{ inquiry.created_at|date:"M d, Y H:i" }}</small>
+                            </div>
+                            <p class="mb-1">
+                                {% if inquiry.phone %}
+                                    <a href="tel:{{ inquiry.phone }}">{{ inquiry.phone }}</a>
+                                {% endif %}
+                                {% if inquiry.email %}
+                                    {% if inquiry.phone %}<span class="mx-2">•</span>{% endif %}
+                                    <a href="mailto:{{ inquiry.email }}">{{ inquiry.email }}</a>
+                                {% endif %}
+                            </p>
+                            <p class="mb-2">{{ inquiry.message }}</p>
+                            <span class="badge bg-secondary">{{ inquiry.get_status_display }}</span>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="mb-0 mt-3">No customer inquiries yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>

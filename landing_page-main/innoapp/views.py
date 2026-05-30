@@ -1,15 +1,25 @@
 import json
+from xml.sax.saxutils import escape as xml_escape
 from urllib.parse import urlparse
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.validators import URLValidator
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
-from .models import EventInsight, HeroVideo, MediaContent, PageContent, SocialLink, Testimonial
+from .models import (
+    CustomerInquiry,
+    EventInsight,
+    GalleryItem,
+    HeroVideo,
+    MediaContent,
+    PageContent,
+    SocialLink,
+    Testimonial,
+)
 
 
 DEFAULT_PAGE_CONTENT = {
@@ -17,11 +27,12 @@ DEFAULT_PAGE_CONTENT = {
     "site_tagline": "Digital Strategy & Growth",
     "nav_home": "Home",
     "nav_about": "About",
+    "nav_gallery": "Gallery",
     "nav_membership": "Client Stories",
     "nav_events": "Insights",
     "nav_contact": "Contact",
     "nav_pages": "Pages",
-    "login_button": "Admin Login",
+    "login_button": "Login",
     "login_title": "Admin Login",
     "login_help": "Use your Django staff credentials to unlock edit mode.",
     "login_username_label": "Username",
@@ -48,6 +59,11 @@ DEFAULT_PAGE_CONTENT = {
     "newsletter_body": "Monthly ideas on improving your website, customer follow-up, and local marketing systems.",
     "newsletter_placeholder": "Work email address",
     "newsletter_button": "Subscribe",
+    "gallery_section_eyebrow": "Project Gallery",
+    "gallery_section_title": "Explore Our Digital Work",
+    "gallery_section_subtitle": "A modern view of services, systems, and customer-focused improvements delivered for growing teams.",
+    "gallery_empty": "No gallery items yet. Add your first gallery item from admin.",
+    "gallery_add_button": "Add Gallery Item",
     "testimony_section_title": "What Clients Say",
     "testimony_section_subtitle": "Real feedback from teams that trust InnoWorks Studio.",
     "testimony_one_name": "Amina Carter",
@@ -106,6 +122,24 @@ DEFAULT_PAGE_CONTENT = {
     "contact_name_label": "Full Name",
     "contact_email_label": "Email address",
     "contact_message_label": "Message",
+    "floating_contact_button": "Contact Us",
+    "floating_contact_title": "How can we help?",
+    "floating_contact_subtitle": "Send your details and our team will contact you shortly.",
+    "floating_contact_name": "Your Name",
+    "floating_contact_phone": "Phone Number",
+    "floating_contact_email": "Email Address",
+    "floating_contact_message": "How can we help you?",
+    "floating_contact_submit": "Send Request",
+    "floating_contact_success": "Thank you. Your message has been received.",
+    "seo_site_name": "InnoWorks Studio",
+    "seo_default_title": "InnoWorks Studio | Digital Strategy & Growth",
+    "seo_default_description": "InnoWorks Studio helps growing teams build trusted websites, digital workflows, customer inquiry systems, and practical content strategies.",
+    "seo_default_keywords": "digital strategy, business website, landing page, customer inquiries, web design, automation, Dar es Salaam",
+    "seo_author": "InnoWorks Studio",
+    "seo_og_type": "website",
+    "seo_twitter_card": "summary_large_image",
+    "seo_theme_color": "#3D405B",
+    "seo_robots": "index, follow",
     "social_empty": "No social links configured.",
     "listing_page_title": "Insights & Updates",
     "listing_page_cta": "Explore Insights",
@@ -313,6 +347,45 @@ DEFAULT_EVENTS = [
     },
 ]
 
+DEFAULT_GALLERY_ITEMS = [
+    {
+        "title": "Website Experience Design",
+        "subtitle": "Clean pages that help visitors understand and act quickly.",
+        "description": "A modern landing page layout focused on trust, speed, mobile usability, and clear calls-to-action.",
+        "category": "Design",
+        "sort_order": 1,
+        "is_featured": True,
+        "is_active": True,
+    },
+    {
+        "title": "Digital Workflow Setup",
+        "subtitle": "Simple systems for capturing and following up with customer inquiries.",
+        "description": "We help teams connect forms, WhatsApp actions, email notifications, and organized lead tracking.",
+        "category": "Automation",
+        "sort_order": 2,
+        "is_featured": True,
+        "is_active": True,
+    },
+    {
+        "title": "Content Refresh",
+        "subtitle": "Sharper words, better structure, and stronger service presentation.",
+        "description": "Service pages, updates, and business profiles are arranged to help customers trust the company faster.",
+        "category": "Content",
+        "sort_order": 3,
+        "is_featured": False,
+        "is_active": True,
+    },
+    {
+        "title": "Customer Support Channels",
+        "subtitle": "Make it easy for people to contact the business from any device.",
+        "description": "Floating contact buttons, WhatsApp links, and inquiry forms help visitors reach the right team quickly.",
+        "category": "Support",
+        "sort_order": 4,
+        "is_featured": False,
+        "is_active": True,
+    },
+]
+
 DEFAULT_SOCIAL_LINKS = [
     {"name": "Instagram", "url": "https://instagram.com", "icon_class": "bi-instagram"},
     {"name": "Twitter", "url": "https://twitter.com", "icon_class": "bi-twitter"},
@@ -337,11 +410,13 @@ TEXT_MODEL_FIELDS = {
     "testimonial": (Testimonial, {"name", "role", "quote", "whatsapp_url"}),
     "event": (EventInsight, {"title", "summary", "body", "day", "month", "date_text", "location", "info_label", "info", "button_text"}),
     "hero_video": (HeroVideo, {"title"}),
+    "gallery": (GalleryItem, {"title", "subtitle", "description", "category"}),
 }
 IMAGE_MODEL_FIELDS = {
     "testimonial": (Testimonial, {"image"}),
     "event": (EventInsight, {"image"}),
     "hero_video": (HeroVideo, {"poster"}),
+    "gallery": (GalleryItem, {"image"}),
 }
 VIDEO_MODEL_FIELDS = {
     "hero_video": (HeroVideo, {"video"}),
@@ -367,6 +442,10 @@ def _media_payload(instance):
 def _ensure_defaults():
     for key, value in DEFAULT_PAGE_CONTENT.items():
         item, created = PageContent.objects.get_or_create(key=key, defaults={"content": value})
+        if not created and key == "login_button" and item.content == "Admin Login":
+            item.content = value
+            item.save(update_fields=["content"])
+            continue
         if not created and item.content in {
             LEGACY_DEFAULT_PAGE_CONTENT.get(key),
             GENERIC_DEFAULT_PAGE_CONTENT.get(key),
@@ -385,6 +464,9 @@ def _ensure_defaults():
     if not EventInsight.objects.exists():
         for item in DEFAULT_EVENTS:
             EventInsight.objects.create(**item)
+    if not GalleryItem.objects.exists():
+        for item in DEFAULT_GALLERY_ITEMS:
+            GalleryItem.objects.create(**item)
 
 
 def _shared_context(request):
@@ -393,17 +475,30 @@ def _shared_context(request):
     media_dict = {item.key: _media_payload(item) for item in MediaContent.objects.all()}
     events = EventInsight.objects.filter(is_active=True).order_by("sort_order", "id")
     featured_events = events.filter(is_featured=True)
+    gallery_items = GalleryItem.objects.filter(is_active=True).order_by("sort_order", "id")
+    if request.user.is_staff:
+        customer_inquiries = CustomerInquiry.objects.all().order_by("-created_at")[:20]
+        unread_inquiry_count = CustomerInquiry.objects.filter(status=CustomerInquiry.STATUS_NEW).count()
+    else:
+        customer_inquiries = []
+        unread_inquiry_count = 0
     return {
         "content": content_dict,
         "media": media_dict,
         "socials": SocialLink.objects.all().order_by("id"),
         "is_edit_mode": request.user.is_staff,
+        "site_url": request.build_absolute_uri("/").rstrip("/"),
+        "canonical_url": request.build_absolute_uri(request.path),
         "hero_words": [word.strip() for word in content_dict.get("hero_rotating_words", "Reliable|Professional|Trusted").split("|") if word.strip()],
         "hero_videos": HeroVideo.objects.filter(is_active=True).order_by("sort_order", "id"),
         "testimonials": Testimonial.objects.filter(is_active=True).order_by("sort_order", "id"),
         "events": events,
         "featured_events": featured_events,
         "detail_event": events.first(),
+        "gallery_items": gallery_items,
+        "featured_gallery_items": gallery_items.filter(is_featured=True),
+        "customer_inquiries": customer_inquiries,
+        "unread_inquiry_count": unread_inquiry_count,
     }
 
 
@@ -437,6 +532,40 @@ def event_list(request):
     context = _shared_context(request)
     context["active_page"] = "listing"
     return render(request, "event-listing.html", context)
+
+
+@require_GET
+def robots_txt(request):
+    lines = [
+        "User-agent: *",
+        "Allow: /",
+        f"Sitemap: {request.build_absolute_uri('/sitemap.xml')}",
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain")
+
+
+@require_GET
+def sitemap_xml(request):
+    site_url = request.build_absolute_uri("/").rstrip("/")
+    urls = [
+        {"loc": f"{site_url}/", "priority": "1.0"},
+        {"loc": f"{site_url}/list/", "priority": "0.8"},
+        {"loc": f"{site_url}/details/", "priority": "0.7"},
+    ]
+
+    xml_items = []
+    for item in urls:
+        loc = xml_escape(item["loc"])
+        priority = xml_escape(item["priority"])
+        xml_items.append(
+            f"<url><loc>{loc}</loc><changefreq>weekly</changefreq><priority>{priority}</priority></url>"
+        )
+
+    xml = '<?xml version="1.0" encoding="UTF-8"?>'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+    xml += "".join(xml_items)
+    xml += "</urlset>"
+    return HttpResponse(xml, content_type="application/xml")
 
 
 @require_POST
@@ -600,6 +729,60 @@ def update_youtube(request):
     if staff_error:
         return staff_error
     return JsonResponse({"error": "Video URLs are disabled. Upload a video file instead."}, status=400)
+
+
+@require_POST
+def create_gallery_item(request):
+    staff_error = _staff_required(request)
+    if staff_error:
+        return staff_error
+
+    last_order = GalleryItem.objects.order_by("-sort_order", "-id").values_list("sort_order", flat=True).first() or 0
+    item = GalleryItem.objects.create(
+        title="New Gallery Item",
+        subtitle="Add a short subtitle for this gallery item.",
+        description="Describe this work, service, or project clearly so visitors understand its value.",
+        category="Featured",
+        sort_order=last_order + 1,
+        is_active=True,
+    )
+
+    return JsonResponse({
+        "success": True,
+        "id": item.id,
+        "message": "Gallery item created.",
+    })
+
+
+@require_POST
+def submit_inquiry(request):
+    name = (request.POST.get("name") or "").strip()
+    phone = (request.POST.get("phone") or "").strip()
+    email = (request.POST.get("email") or "").strip()
+    message = (request.POST.get("message") or "").strip()
+
+    if not name:
+        return JsonResponse({"error": "Please enter your name."}, status=400)
+
+    if not phone and not email:
+        return JsonResponse({"error": "Please enter phone or email so we can contact you."}, status=400)
+
+    if not message:
+        return JsonResponse({"error": "Please write your message."}, status=400)
+
+    inquiry = CustomerInquiry.objects.create(
+        name=name,
+        phone=phone,
+        email=email,
+        message=message,
+        source="Floating Contact Form",
+    )
+
+    return JsonResponse({
+        "success": True,
+        "message": "Thank you. Your message has been received.",
+        "id": inquiry.id,
+    })
 
 
 @require_POST

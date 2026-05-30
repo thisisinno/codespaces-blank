@@ -323,6 +323,16 @@
         openVideoGalleryUploader(document.querySelector('.editable-video-gallery'));
     });
 
+    document.getElementById('addGalleryItemButton')?.addEventListener('click', async () => {
+        try {
+            await request('/gallery/create/', { method: 'POST' });
+            showToast('Gallery item added successfully');
+            window.setTimeout(() => window.location.reload(), 500);
+        } catch (error) {
+            handleError(error, 'Gallery item could not be added.');
+        }
+    });
+
     heroVideoFilesInput?.addEventListener('change', async () => {
         try {
             if (!heroVideoFilesInput.files.length) {
