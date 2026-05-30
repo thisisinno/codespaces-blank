@@ -1,0 +1,41 @@
+.edit-mode-badge {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1085;
+    padding: 0.5rem 0.9rem;
+    border-radius: 999px;
+    background: #dc3545;
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+body[data-is-staff="true"] .editable:hover,
+body[data-is-staff="true"] .editable-image:hover,
+body[data-is-staff="true"] .editable-video:hover,
+body[data-is-staff="true"] .editable-link:hover {
+    outline: 2px dashed rgba(220, 53, 69, 0.9);
+    outline-offset: 4px;
+    cursor: context-menu;
+}
+
+.cms-context-menu {
+    position: fixed;
+    z-index: 2000;
+    min-width: 180px;
+    display: none;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0.75rem;
+    padding: 0.35rem;
+}
+
+.cms-context-menu.show {
+    display: block;
+}
+
+.cms-context-menu .dropdown-item {
+    border-radius: 0.5rem;
+}
