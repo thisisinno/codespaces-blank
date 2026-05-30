@@ -1,0 +1,38 @@
+{% load static %}
+{% static 'images/logo.png' as logo_fallback %}
+<footer class="site-footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 col-12 me-auto mb-5 mb-lg-0">
+                <a class="navbar-brand d-flex align-items-center" href="{% url 'homepage' %}">
+                    <img src="{% firstof media.site_logo.image_url logo_fallback %}" class="navbar-brand-image img-fluid editable-image" alt="logo" data-key="site_logo">
+                    <span class="navbar-brand-text">
+                        <span class="editable" data-key="site_brand">{{ content.site_brand|default:"InnoWorks Studio" }}</span>
+                        <small class="editable" data-key="site_tagline">{{ content.site_tagline|default:"Digital Strategy & Growth" }}</small>
+                    </span>
+                </a>
+            </div>
+            <div class="col-lg-3 col-12">
+                <h5 class="site-footer-title mb-4 editable" data-key="footer_join_title">{{ content.footer_join_title|default:"Studio Hours" }}</h5>
+                <p class="d-flex border-bottom pb-3 mb-3 me-lg-3"><span class="editable" data-key="footer_weekday_label">{{ content.footer_weekday_label|default:"Mon-Fri" }}</span><span class="ms-auto editable" data-key="footer_weekday_hours">{{ content.footer_weekday_hours|default:"8:00 AM - 5:00 PM" }}</span></p>
+                <p class="d-flex me-lg-3"><span class="editable" data-key="footer_weekend_label">{{ content.footer_weekend_label|default:"Sat-Sun" }}</span><span class="ms-auto editable" data-key="footer_weekend_hours">{{ content.footer_weekend_hours|default:"Closed" }}</span></p>
+                <br>
+                <p class="copyright-text editable" data-key="footer_copyright">{{ content.footer_copyright|default:"Copyright © 2026 InnoWorks Studio" }}</p>
+            </div>
+            <div class="col-lg-2 col-12 ms-auto">
+                <h6 class="text-white editable" data-key="social_section_title">{{ content.social_section_title|default:"Follow Us" }}</h6>
+                <ul class="social-icon mt-lg-5 mt-3 mb-4">
+                    {% for social in socials %}
+                        <li class="social-icon-item">
+                            <a href="{{ social.url|default:'#' }}" class="social-icon-link {{ social.icon_class|default:'bi-link-45deg' }} editable-link" data-social-id="{{ social.id }}" data-name="{{ social.name|default:'' }}" data-url="{{ social.url|default:'' }}" data-icon="{{ social.icon_class|default:'' }}" title="{{ social.name|default:'' }}"></a>
+                        </li>
+                    {% empty %}
+                        <li class="text-white editable" data-key="social_empty">{{ content.social_empty|default:"No social links configured." }}</li>
+                    {% endfor %}
+                </ul>
+                <p class="copyright-text editable" data-key="footer_credit">{{ content.footer_credit|default:"Design: TemplateMo. Distributed by ThemeWagon" }}</p>
+            </div>
+        </div>
+    </div>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#81B29A" fill-opacity="1" d="M0,224L34.3,192C68.6,160,137,96,206,90.7C274.3,85,343,139,411,144C480,149,549,107,617,122.7C685.7,139,754,213,823,240C891.4,267,960,245,1029,224C1097.1,203,1166,181,1234,160C1302.9,139,1371,117,1406,106.7L1440,96L1440,320L1405.7,320C1371.4,320,1303,320,1234,320C1165.7,320,1097,320,1029,320C960,320,891,320,823,320C754.3,320,686,320,617,320C548.6,320,480,320,411,320C342.9,320,274,320,206,320C137.1,320,69,320,34,320L0,320Z"></path></svg>
+</footer>

@@ -1,471 +1,125 @@
+{% extends "base.html" %}
 {% load static %}
-{% static 'images/logo.png' as logo_fallback %}
-{% static 'images/members/portrait-young-handsome-businessman-wearing-suit-standing-with-crossed-arms-with-isolated-studio-white-background.jpg' as founder_fallback %}
-{% static 'images/members/successful-asian-lady-boss-red-blazer-holding-clipboard-with-documens-pen-working-looking-happy-white-background.jpg' as cofounder_fallback %}
-{% static 'images/professional-golf-player.jpg' as event_one_fallback %}
-{% static 'images/girl-taking-selfie-with-friends-golf-field.jpg' as event_two_fallback %}
-{% static 'images/WorldMap.svg' as contact_map_fallback %}
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="{% firstof content.site_tagline 'Your Tagline' %}">
-        <meta name="author" content="OpenAI">
-        <title>{% firstof content.site_brand 'Your Brand' %} - {% firstof content.site_tagline 'Your Tagline' %}</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
-        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-        <link href="{% static 'css/bootstrap-icons.css' %}" rel="stylesheet">
-        <link href="{% static 'css/templatemo-tiya-golf-club.css' %}" rel="stylesheet">
-        <link href="{% static 'css/cms-editor.css' %}" rel="stylesheet">
-    </head>
-    <body data-is-staff="{{ is_edit_mode|yesno:'true,false' }}">
-        {% csrf_token %}
-        <main>
-            {% if is_edit_mode %}
-                <div class="edit-mode-badge shadow-sm editable" data-key="edit_mode_badge">{{ content.edit_mode_badge|default:"EDIT MODE ACTIVE" }}</div>
-            {% endif %}
+{% block title %}{% firstof content.site_brand "InnoWorks Studio" %} - {% firstof content.site_tagline "Digital Strategy & Growth" %}{% endblock %}
 
-            <nav class="navbar navbar-expand-lg">
-                <div class="container">
-                    <a class="navbar-brand d-flex align-items-center" href="{% url 'homepage' %}">
-                        <img src="{% firstof media.site_logo.image_url logo_fallback %}" class="navbar-brand-image img-fluid editable-image" alt="logo" data-key="site_logo">
-                        <span class="navbar-brand-text">
-                            <span class="editable" data-key="site_brand">{{ content.site_brand|default:"Your Brand" }}</span>
-                            <small class="editable" data-key="site_tagline">{{ content.site_tagline|default:"Your Tagline" }}</small>
+{% block content %}
+    {% static 'images/logo.png' as logo_fallback %}
+    {% static 'images/anna-rosar-ZxFyVBHMK-c-unsplash.jpg' as founder_fallback %}
+    {% static 'images/anna-rosar-ew-olGvgCCs-unsplash.jpg' as cofounder_fallback %}
+    {% static 'images/professional-golf-player.jpg' as event_one_fallback %}
+    {% static 'images/girl-taking-selfie-with-friends-golf-field.jpg' as event_two_fallback %}
+    {% static 'images/WorldMap.svg' as contact_map_fallback %}
+
+    <section class="hero-section d-flex justify-content-center align-items-center" id="section_1">
+        <div class="section-overlay"></div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#3D405B" fill-opacity="1" d="M0,224L34.3,192C68.6,160,137,96,206,90.7C274.3,85,343,139,411,144C480,149,549,107,617,122.7C685.7,139,754,213,823,240C891.4,267,960,245,1029,224C1097.1,203,1166,181,1234,160C1302.9,139,1371,117,1406,106.7L1440,96L1440,0L1405.7,0C1371.4,0,1303,0,1234,0C1165.7,0,1097,0,1029,0C960,0,891,0,823,0C754.3,0,686,0,617,0C548.6,0,480,0,411,0C342.9,0,274,0,206,0C137.1,0,69,0,34,0L0,0Z"></path></svg>
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-5 col-12 mb-5 mb-lg-0">
+                    <h2 class="text-white editable" data-key="hero_welcome">{{ content.hero_welcome|default:"Practical digital support for growing teams" }}</h2>
+                    <h1 class="cd-headline rotate-1 text-white mb-4 pb-2">
+                        <span class="editable" data-key="hero_title_prefix">{{ content.hero_title_prefix|default:"We build" }}</span>
+                        <span class="cd-words-wrapper editable" data-key="hero_rotating_words" data-display="pipe-list">
+                            {% for word in hero_words %}<b class="{% if forloop.first %}is-visible{% endif %}">{{ word }}</b>{% endfor %}
                         </span>
-                    </a>
-
-                    <div class="d-lg-none ms-auto me-3">
-                        {% if user.is_authenticated %}
-                            <a class="btn custom-btn custom-border-btn editable" href="{% url 'logout' %}" data-key="logout_button">{{ content.logout_button|default:"Logout" }}</a>
-                        {% else %}
-                            <a class="btn custom-btn custom-border-btn editable" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample" data-key="login_button">
-                                {{ content.login_button|default:"Admin Login" }}
-                            </a>
-                        {% endif %}
-                    </div>
-
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                        <ul class="navbar-nav ms-lg-auto">
-                            <li class="nav-item"><a class="nav-link click-scroll editable" href="#section_1" data-key="nav_home">{{ content.nav_home|default:"Home" }}</a></li>
-                            <li class="nav-item"><a class="nav-link click-scroll editable" href="#section_2" data-key="nav_about">{{ content.nav_about|default:"About" }}</a></li>
-                            <li class="nav-item"><a class="nav-link click-scroll editable" href="#section_3" data-key="nav_membership">{{ content.nav_membership|default:"Testimonials" }}</a></li>
-                            <li class="nav-item"><a class="nav-link click-scroll editable" href="#section_4" data-key="nav_events">{{ content.nav_events|default:"Latest Updates" }}</a></li>
-                            <li class="nav-item"><a class="nav-link click-scroll editable" href="#section_5" data-key="nav_contact">{{ content.nav_contact|default:"Contact Us" }}</a></li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle editable" href="#" id="navbarLightDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-key="nav_pages">{{ content.nav_pages|default:"Pages" }}</a>
-                                <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="navbarLightDropdownMenuLink">
-                                    <li><a class="dropdown-item editable" href="{% url 'list' %}" data-key="nav_event_listing">{{ content.nav_event_listing|default:"Event Listing" }}</a></li>
-                                    <li><a class="dropdown-item editable" href="{% url 'details' %}" data-key="nav_event_detail">{{ content.nav_event_detail|default:"Event Detail" }}</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                        <div class="d-none d-lg-block ms-lg-3">
-                            {% if user.is_authenticated %}
-                                <a class="btn custom-btn custom-border-btn editable" href="{% url 'logout' %}" data-key="logout_button">{{ content.logout_button|default:"Logout" }}</a>
-                            {% else %}
-                                <a class="btn custom-btn custom-border-btn editable" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample" data-key="login_button">{{ content.login_button|default:"Admin Login" }}</a>
-                            {% endif %}
-                        </div>
+                    </h1>
+                    <div class="custom-btn-group">
+                        <a href="#section_2" class="btn custom-btn smoothscroll editable" data-key="hero_story_cta">{{ content.hero_story_cta|default:"Our Story" }}</a>
+                        <a href="#section_3" class="link smoothscroll editable" data-key="hero_member_cta">{{ content.hero_member_cta|default:"Read Client Stories" }}</a>
                     </div>
                 </div>
-            </nav>
-
-            <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
-                <div class="offcanvas-header">
-                    <h5 class="offcanvas-title editable" id="offcanvasExampleLabel" data-key="login_title">{{ content.login_title|default:"Admin Login" }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                </div>
-                <div class="offcanvas-body d-flex flex-column">
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
-                        {% endfor %}
-                    {% endif %}
-                    <p class="text-white editable" data-key="login_help">{{ content.login_help|default:"Use your Django staff credentials to unlock edit mode." }}</p>
-                    <form class="custom-form member-login-form" action="{% url 'login' %}" method="post" role="form">
-                        {% csrf_token %}
-                        <div class="member-login-form-body">
-                            <div class="mb-4">
-                                <label class="form-label mb-2 editable" for="member-login-number" data-key="login_username_label">{{ content.login_username_label|default:"Username" }}</label>
-                                <input type="text" name="username" id="member-login-number" class="form-control" placeholder="admin" required>
-                            </div>
-                            <div class="mb-4">
-                                <label class="form-label mb-2 editable" for="member-login-password" data-key="login_password_label">{{ content.login_password_label|default:"Password" }}</label>
-                                <input type="password" name="password" id="member-login-password" class="form-control" placeholder="Password" required>
-                            </div>
-                            <div class="col-lg-5 col-md-7 col-8 mx-auto">
-                                <button type="submit" class="form-control editable" data-key="login_submit">{{ content.login_submit|default:"Login" }}</button>
-                            </div>
-                        </div>
-                    </form>
-                    <div class="mt-auto mb-5">
-                        <p>
-                            <strong class="text-white me-3 editable" data-key="login_footer_label">{{ content.login_footer_label|default:"Need help?" }}</strong>
-                            <a href="mailto:{{ content.login_footer_value|default:'support@example.com' }}" class="contact-link editable" data-key="login_footer_value">{{ content.login_footer_value|default:"support@example.com" }}</a>
-                        </p>
-                    </div>
-                </div>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#3D405B" fill-opacity="1" d="M0,224L34.3,192C68.6,160,137,96,206,90.7C274.3,85,343,139,411,144C480,149,549,107,617,122.7C685.7,139,754,213,823,240C891.4,267,960,245,1029,224C1097.1,203,1166,181,1234,160C1302.9,139,1371,117,1406,106.7L1440,96L1440,320L1405.7,320C1371.4,320,1303,320,1234,320C1165.7,320,1097,320,1029,320C960,320,891,320,823,320C754.3,320,686,320,617,320C548.6,320,480,320,411,320C342.9,320,274,320,206,320C137.1,320,69,320,34,320L0,320Z"></path></svg>
-            </div>
-
-            <section class="hero-section d-flex justify-content-center align-items-center" id="section_1">
-                <div class="section-overlay"></div>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#3D405B" fill-opacity="1" d="M0,224L34.3,192C68.6,160,137,96,206,90.7C274.3,85,343,139,411,144C480,149,549,107,617,122.7C685.7,139,754,213,823,240C891.4,267,960,245,1029,224C1097.1,203,1166,181,1234,160C1302.9,139,1371,117,1406,106.7L1440,96L1440,0L1405.7,0C1371.4,0,1303,0,1234,0C1165.7,0,1097,0,1029,0C960,0,891,0,823,0C754.3,0,686,0,617,0C548.6,0,480,0,411,0C342.9,0,274,0,206,0C137.1,0,69,0,34,0L0,0Z"></path></svg>
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-6 col-12 mb-5 mb-lg-0">
-                            <h2 class="text-white editable" data-key="hero_welcome">{{ content.hero_welcome|default:"Welcome to Our Website" }}</h2>
-                            <h1 class="cd-headline rotate-1 text-white mb-4 pb-2">
-                                <span class="editable" data-key="hero_title_prefix">{{ content.hero_title_prefix|default:"We are" }}</span>
-                                <span class="cd-words-wrapper editable" data-key="hero_rotating_words" data-display="pipe-list">
-                                    {% for word in hero_words %}
-                                        <b class="{% if forloop.first %}is-visible{% endif %}">{{ word }}</b>
-                                    {% endfor %}
-                                </span>
-                            </h1>
-                            <div class="custom-btn-group">
-                                <a href="#section_2" class="btn custom-btn smoothscroll editable" data-key="hero_story_cta">{{ content.hero_story_cta|default:"Our Story" }}</a>
-                                <a href="#section_3" class="link smoothscroll editable" data-key="hero_member_cta">{{ content.hero_member_cta|default:"Read Testimonials" }}</a>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 col-12">
-                            <div class="ratio ratio-16x9 editable-video" data-key="hero_video">
-                                {% if media.hero_video.youtube_url %}
-                                    <iframe src="{{ media.hero_video.youtube_embed_url }}" title="Hero video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                                {% elif media.hero_video.video_url %}
-                                    <video controls class="w-100 h-100 object-fit-cover"><source src="{{ media.hero_video.video_url }}"></video>
+                <div class="col-lg-7 col-12">
+                    <div class="hero-video-grid">
+                        {% for video in hero_videos %}
+                            <div class="ratio ratio-16x9 editable-video" data-model="hero_video" data-id="{{ video.id }}" data-field="video">
+                                {% if video.video %}
+                                    <video controls class="w-100 h-100 object-fit-cover" {% if video.poster %}poster="{{ video.poster.url }}"{% endif %}><source src="{{ video.video.url }}"></video>
                                 {% else %}
-                                    <div class="d-flex justify-content-center align-items-center bg-dark text-white rounded"><span class="editable" data-key="hero_video_placeholder">{{ content.hero_video_placeholder|default:"No video selected" }}</span></div>
+                                    <div class="d-flex justify-content-center align-items-center bg-dark text-white rounded h-100">
+                                        <span class="editable" data-model="hero_video" data-id="{{ video.id }}" data-field="title">{{ video.title|default:"Upload a hero video" }}</span>
+                                    </div>
                                 {% endif %}
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#ffffff" fill-opacity="1" d="M0,224L34.3,192C68.6,160,137,96,206,90.7C274.3,85,343,139,411,144C480,149,549,107,617,122.7C685.7,139,754,213,823,240C891.4,267,960,245,1029,224C1097.1,203,1166,181,1234,160C1302.9,139,1371,117,1406,106.7L1440,96L1440,320L1405.7,320C1371.4,320,1303,320,1234,320C1165.7,320,1097,320,1029,320C960,320,891,320,823,320C754.3,320,686,320,617,320C548.6,320,480,320,411,320C342.9,320,274,320,206,320C137.1,320,69,320,34,320L0,320Z"></path></svg>
-            </section>
-
-            <section class="about-section section-padding" id="section_2">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-12 col-12 text-center">
-                            <h2 class="mb-lg-5 mb-4 editable" data-key="about_section_title">{{ content.about_section_title|default:"About Us" }}</h2>
-                        </div>
-                        <div class="col-lg-5 col-12 me-auto mb-4 mb-lg-0">
-                            <h3 class="mb-3 editable" data-key="about_history_title">{{ content.about_history_title|default:"Who We Are" }}</h3>
-                            <p class="editable" data-key="about_history_body">{{ content.about_history_body|default:"Write a short description about your company, mission, and services here." }}</p>
-                            <p class="editable" data-key="about_history_body_two">{{ content.about_history_body_two|default:"Use this area to explain why customers should trust your business." }}</p>
-                        </div>
-                        <div class="col-lg-3 col-md-6 col-12 mb-4 mb-lg-0 mb-md-0">
-                            <div class="member-block">
-                                <div class="member-block-image-wrap">
-                                    <img src="{% firstof media.founder_image.image_url founder_fallback %}" class="member-block-image img-fluid editable-image" alt="Founder" data-key="founder_image">
-                                </div>
-                                <div class="member-block-info d-flex align-items-center">
-                                    <h4 class="editable" data-key="founder_name">{{ content.founder_name|default:"Team Member Name" }}</h4>
-                                    <p class="ms-auto editable" data-key="founder_role">{{ content.founder_role|default:"Founder / Manager" }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-md-6 col-12">
-                            <div class="member-block">
-                                <div class="member-block-image-wrap">
-                                    <img src="{% firstof media.cofounder_image.image_url cofounder_fallback %}" class="member-block-image img-fluid editable-image" alt="Co-Founder" data-key="cofounder_image">
-                                </div>
-                                <div class="member-block-info d-flex align-items-center">
-                                    <h4 class="editable" data-key="cofounder_name">{{ content.cofounder_name|default:"Team Member Name" }}</h4>
-                                    <p class="ms-auto editable" data-key="cofounder_role">{{ content.cofounder_role|default:"Operations Lead" }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="section-bg-image">
-                <svg viewBox="0 0 1265 144" xmlns="http://www.w3.org/2000/svg"><path fill="rgba(255, 255, 255, 1)" d="M 0 40 C 164 40 164 20 328 20 L 328 20 L 328 0 L 0 0 Z"></path><path fill="rgba(255, 255, 255, 1)" d="M 327 20 C 445.5 20 445.5 89 564 89 L 564 89 L 564 0 L 327 0 Z"></path><path fill="rgba(255, 255, 255, 1)" d="M 563 89 C 724.5 89 724.5 48 886 48 L 886 48 L 886 0 L 563 0 Z"></path><path fill="rgba(255, 255, 255, 1)" d="M 885 48 C 1006.5 48 1006.5 67 1128 67 L 1128 67 L 1128 0 L 885 0 Z"></path><path fill="rgba(255, 255, 255, 1)" d="M 1127 67 C 1196 67 1196 0 1265 0 L 1265 0 L 1265 0 L 1127 0 Z"></path></svg>
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-6 col-12">
-                            <div class="section-bg-image-block">
-                                <h2 class="mb-lg-3 editable" data-key="newsletter_title">{{ content.newsletter_title|default:"Get our newsletter" }}</h2>
-                                <p class="editable" data-key="newsletter_body">{{ content.newsletter_body|default:"Enter a short message encouraging visitors to subscribe or contact you." }}</p>
-                                <form action="#" method="get" class="custom-form mt-lg-4 mt-2" role="form">
-                                    <div class="input-group input-group-lg">
-                                        <span class="input-group-text bi-envelope" id="basic-addon1"></span>
-                                        <input type="email" name="email" class="form-control" placeholder="{{ content.newsletter_placeholder|default:'Email address' }}" data-placeholder-key="newsletter_placeholder" required>
-                                        <button type="submit" class="form-control editable" data-key="newsletter_button">{{ content.newsletter_button|default:"Subscribe" }}</button>
-                                    </div>
-                                    {% if is_edit_mode %}
-                                        <small class="editable cms-placeholder-helper" data-key="newsletter_placeholder">{{ content.newsletter_placeholder|default:"Email address" }}</small>
-                                    {% endif %}
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <svg viewBox="0 0 1265 144" xmlns="http://www.w3.org/2000/svg"><path fill="rgba(255, 255, 255, 1)" d="M 0 40 C 164 40 164 20 328 20 L 328 20 L 328 0 L 0 0 Z"></path><path fill="rgba(255, 255, 255, 1)" d="M 327 20 C 445.5 20 445.5 89 564 89 L 564 89 L 564 0 L 327 0 Z"></path><path fill="rgba(255, 255, 255, 1)" d="M 563 89 C 724.5 89 724.5 48 886 48 L 886 48 L 886 0 L 563 0 Z"></path><path fill="rgba(255, 255, 255, 1)" d="M 885 48 C 1006.5 48 1006.5 67 1128 67 L 1128 67 L 1128 0 L 885 0 Z"></path><path fill="rgba(255, 255, 255, 1)" d="M 1127 67 C 1196 67 1196 0 1265 0 L 1265 0 L 1265 0 L 1127 0 Z"></path></svg>
-            </section>
-
-            <section class="testimony-section section-padding" id="section_3">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-8 col-12 text-center mx-auto mb-lg-5 mb-4">
-                            <h2 class="editable" data-key="testimony_section_title">{{ content.testimony_section_title|default:"What Our Customers Say" }}</h2>
-                            <p class="editable mb-0" data-key="testimony_section_subtitle">{{ content.testimony_section_subtitle|default:"Real feedback from people who trust our services." }}</p>
-                        </div>
-                    </div>
-                    <div class="row g-4 justify-content-center align-items-stretch">
-                        <div class="col-lg-4 col-md-6 col-12">
-                            <div class="testimony-card">
-                                <img src="{% firstof media.testimony_one_image.image_url founder_fallback %}" class="testimony-image img-fluid editable-image" alt="Customer testimonial" data-key="testimony_one_image">
-                                <h4 class="mt-4 mb-2 editable" data-key="testimony_one_name">{{ content.testimony_one_name|default:"Customer Name" }}</h4>
-                                <a href="{{ testimony_links.one }}" target="_blank" rel="noopener" class="testimony-whatsapp-link" data-url-key="testimony_one_whatsapp_url">
-                                    <i class="bi-whatsapp"></i><span class="editable" data-key="testimony_one_contact_label">{{ content.testimony_one_contact_label|default:"Chat on WhatsApp" }}</span>
-                                </a>
-                                {% if is_edit_mode %}
-                                    <small class="testimony-url editable" data-key="testimony_one_whatsapp_url">{{ content.testimony_one_whatsapp_url|default:"https://wa.me/255700000000" }}</small>
-                                {% endif %}
-                                <p class="testimony-text editable" data-key="testimony_one_text">{{ content.testimony_one_text|default:"Write the customer testimonial here. Explain the experience, service quality, and result." }}</p>
-                                <div class="testimony-stars" aria-label="{{ content.testimony_one_rating|default:'Rated 5/5' }}">
-                                    <i class="bi-star-fill"></i><i class="bi-star-fill"></i><i class="bi-star-fill"></i><i class="bi-star-fill"></i><i class="bi-star-fill"></i>
-                                </div>
-                                <small class="testimony-rating editable" data-key="testimony_one_rating">{{ content.testimony_one_rating|default:"Rated 5/5" }}</small>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-6 col-12">
-                            <div class="testimony-card">
-                                <img src="{% firstof media.testimony_two_image.image_url cofounder_fallback %}" class="testimony-image img-fluid editable-image" alt="Customer testimonial" data-key="testimony_two_image">
-                                <h4 class="mt-4 mb-2 editable" data-key="testimony_two_name">{{ content.testimony_two_name|default:"Customer Name" }}</h4>
-                                <a href="{{ testimony_links.two }}" target="_blank" rel="noopener" class="testimony-whatsapp-link" data-url-key="testimony_two_whatsapp_url">
-                                    <i class="bi-whatsapp"></i><span class="editable" data-key="testimony_two_contact_label">{{ content.testimony_two_contact_label|default:"Chat on WhatsApp" }}</span>
-                                </a>
-                                {% if is_edit_mode %}
-                                    <small class="testimony-url editable" data-key="testimony_two_whatsapp_url">{{ content.testimony_two_whatsapp_url|default:"https://wa.me/255700000001" }}</small>
-                                {% endif %}
-                                <p class="testimony-text editable" data-key="testimony_two_text">{{ content.testimony_two_text|default:"Share another customer story here so visitors can understand the value you provide." }}</p>
-                                <div class="testimony-stars" aria-label="{{ content.testimony_two_rating|default:'Rated 5/5' }}">
-                                    <i class="bi-star-fill"></i><i class="bi-star-fill"></i><i class="bi-star-fill"></i><i class="bi-star-fill"></i><i class="bi-star-fill"></i>
-                                </div>
-                                <small class="testimony-rating editable" data-key="testimony_two_rating">{{ content.testimony_two_rating|default:"Rated 5/5" }}</small>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-6 col-12">
-                            <div class="testimony-card">
-                                <img src="{% firstof media.testimony_three_image.image_url founder_fallback %}" class="testimony-image img-fluid editable-image" alt="Customer testimonial" data-key="testimony_three_image">
-                                <h4 class="mt-4 mb-2 editable" data-key="testimony_three_name">{{ content.testimony_three_name|default:"Customer Name" }}</h4>
-                                <a href="{{ testimony_links.three }}" target="_blank" rel="noopener" class="testimony-whatsapp-link" data-url-key="testimony_three_whatsapp_url">
-                                    <i class="bi-whatsapp"></i><span class="editable" data-key="testimony_three_contact_label">{{ content.testimony_three_contact_label|default:"Chat on WhatsApp" }}</span>
-                                </a>
-                                {% if is_edit_mode %}
-                                    <small class="testimony-url editable" data-key="testimony_three_whatsapp_url">{{ content.testimony_three_whatsapp_url|default:"https://wa.me/255700000002" }}</small>
-                                {% endif %}
-                                <p class="testimony-text editable" data-key="testimony_three_text">{{ content.testimony_three_text|default:"Use this testimonial to highlight reliability, support, or a successful outcome." }}</p>
-                                <div class="testimony-stars" aria-label="{{ content.testimony_three_rating|default:'Rated 5/5' }}">
-                                    <i class="bi-star-fill"></i><i class="bi-star-fill"></i><i class="bi-star-fill"></i><i class="bi-star-fill"></i><i class="bi-star-fill"></i>
-                                </div>
-                                <small class="testimony-rating editable" data-key="testimony_three_rating">{{ content.testimony_three_rating|default:"Rated 5/5" }}</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="events-section section-bg section-padding" id="section_4">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-12 col-12"><h2 class="mb-lg-3 editable" data-key="events_title">{{ content.events_title|default:"Latest Updates" }}</h2></div>
-                        <div class="row custom-block mb-3">
-                            <div class="col-lg-2 col-md-4 col-12 order-2 order-md-0 order-lg-0">
-                                <div class="custom-block-date-wrap d-flex d-lg-block d-md-block align-items-center mt-3 mt-lg-0 mt-md-0">
-                                    <h6 class="custom-block-date mb-lg-1 mb-0 me-3 me-lg-0 me-md-0 editable" data-key="event_one_day">{{ content.event_one_day|default:"24" }}</h6>
-                                    <strong class="text-white editable" data-key="event_one_month">{{ content.event_one_month|default:"Jan 2026" }}</strong>
-                                </div>
-                            </div>
-                            <div class="col-lg-4 col-md-8 col-12 order-1 order-lg-0">
-                                <div class="custom-block-image-wrap">
-                                    <a href="{% url 'details' %}"><img src="{% firstof media.event_one_image.image_url event_one_fallback %}" class="custom-block-image img-fluid editable-image" alt="event 1" data-key="event_one_image"><i class="custom-block-icon bi-link"></i></a>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-12 order-3 order-lg-0">
-                                <div class="custom-block-info mt-2 mt-lg-0">
-                                    <a href="{% url 'details' %}" class="events-title mb-3 editable" data-key="event_one_title">{{ content.event_one_title|default:"Service Update" }}</a>
-                                    <p class="mb-0 editable" data-key="event_one_body">{{ content.event_one_body|default:"Write a short update about your latest service, offer, announcement, or business news." }}</p>
-                                    <div class="d-flex flex-wrap border-top mt-4 pt-3">
-                                        <div class="mb-4 mb-lg-0">
-                                            <div class="d-flex flex-wrap align-items-center mb-1"><span class="custom-block-span editable" data-key="event_one_location_label">{{ content.event_one_location_label|default:"Location:" }}</span><p class="mb-0 editable ms-2" data-key="event_one_location">{{ content.event_one_location|default:"Your business location" }}</p></div>
-                                            <div class="d-flex flex-wrap align-items-center"><span class="custom-block-span editable" data-key="event_one_ticket_label">{{ content.event_one_ticket_label|default:"Info:" }}</span><p class="mb-0 editable ms-2" data-key="event_one_ticket">{{ content.event_one_ticket|default:"Contact us" }}</p></div>
-                                        </div>
-                                        <div class="d-flex align-items-center ms-lg-auto"><a href="{% url 'details' %}" class="btn custom-btn editable" data-key="event_one_button">{{ content.event_one_button|default:"Learn More" }}</a></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row custom-block custom-block-bg">
-                            <div class="col-lg-2 col-md-4 col-12 order-2 order-md-0 order-lg-0">
-                                <div class="custom-block-date-wrap d-flex d-lg-block d-md-block align-items-center mt-3 mt-lg-0 mt-md-0">
-                                    <h6 class="custom-block-date mb-lg-1 mb-0 me-3 me-lg-0 me-md-0 editable" data-key="event_two_day">{{ content.event_two_day|default:"28" }}</h6>
-                                    <strong class="text-white editable" data-key="event_two_month">{{ content.event_two_month|default:"Jan 2026" }}</strong>
-                                </div>
-                            </div>
-                            <div class="col-lg-4 col-md-8 col-12 order-1 order-lg-0">
-                                <div class="custom-block-image-wrap">
-                                    <a href="{% url 'details' %}"><img src="{% firstof media.event_two_image.image_url event_two_fallback %}" class="custom-block-image img-fluid editable-image" alt="event 2" data-key="event_two_image"><i class="custom-block-icon bi-link"></i></a>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-12 order-3 order-lg-0">
-                                <div class="custom-block-info mt-2 mt-lg-0">
-                                    <a href="{% url 'details' %}" class="events-title mb-3 editable" data-key="event_two_title">{{ content.event_two_title|default:"Customer Announcement" }}</a>
-                                    <p class="mb-0 editable" data-key="event_two_body">{{ content.event_two_body|default:"Use this area to share another update, featured service, or useful message for customers." }}</p>
-                                    <div class="d-flex flex-wrap border-top mt-4 pt-3">
-                                        <div class="mb-4 mb-lg-0">
-                                            <div class="d-flex flex-wrap align-items-center mb-1"><span class="custom-block-span editable" data-key="event_two_location_label">{{ content.event_two_location_label|default:"Location:" }}</span><p class="mb-0 editable ms-2" data-key="event_two_location">{{ content.event_two_location|default:"Your business location" }}</p></div>
-                                            <div class="d-flex flex-wrap align-items-center"><span class="custom-block-span editable" data-key="event_two_ticket_label">{{ content.event_two_ticket_label|default:"Info:" }}</span><p class="mb-0 editable ms-2" data-key="event_two_ticket">{{ content.event_two_ticket|default:"Contact us" }}</p></div>
-                                        </div>
-                                        <div class="d-flex align-items-center ms-lg-auto"><a href="{% url 'details' %}" class="btn custom-btn editable" data-key="event_two_button">{{ content.event_two_button|default:"Learn More" }}</a></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="contact-section section-padding" id="section_5">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-5 col-12">
-                            <form action="#" method="post" class="custom-form contact-form" role="form">
-                                <h2 class="mb-4 pb-2 editable" data-key="contact_title">{{ content.contact_title|default:"Contact Us" }}</h2>
-                                <div class="row">
-                                    <div class="col-lg-6 col-md-6 col-12"><div class="form-floating"><input type="text" class="form-control" placeholder="{{ content.contact_name_label|default:'Full Name' }}" data-placeholder-key="contact_name_label" required><label class="editable" data-key="contact_name_label">{{ content.contact_name_label|default:"Full Name" }}</label></div></div>
-                                    <div class="col-lg-6 col-md-6 col-12"><div class="form-floating"><input type="email" class="form-control" placeholder="{{ content.contact_email_label|default:'Email address' }}" data-placeholder-key="contact_email_label" required><label class="editable" data-key="contact_email_label">{{ content.contact_email_label|default:"Email address" }}</label></div></div>
-                                    <div class="col-lg-12 col-12"><div class="form-floating"><textarea class="form-control" placeholder="{{ content.contact_message_label|default:'Message' }}" data-placeholder-key="contact_message_label"></textarea><label class="editable" data-key="contact_message_label">{{ content.contact_message_label|default:"Message" }}</label></div><button type="submit" class="form-control editable" data-key="contact_submit">{{ content.contact_submit|default:"Submit Form" }}</button></div>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="col-lg-6 col-12">
-                            <div class="contact-info mt-5">
-                                <div class="contact-info-item">
-                                    <div class="contact-info-body">
-                                        <strong class="editable" data-key="contact_location">{{ content.contact_location|default:"Your business location" }}</strong>
-                                        <p class="mt-2 mb-1"><a href="tel:+255XXXXXXXXX" class="contact-link editable" data-key="contact_phone">{{ content.contact_phone|default:"+255 XXX XXX XXX" }}</a></p>
-                                        <p class="mb-0"><a href="mailto:{{ content.contact_email|default:'info@example.com' }}" class="contact-link editable" data-key="contact_email">{{ content.contact_email|default:"info@example.com" }}</a></p>
-                                    </div>
-                                    <div class="contact-info-footer"><a href="#" class="editable" data-key="contact_directions">{{ content.contact_directions|default:"Directions" }}</a></div>
-                                </div>
-                                <img src="{% firstof media.contact_map.image_url contact_map_fallback %}" class="img-fluid editable-image" alt="Map" data-key="contact_map">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <footer class="site-footer">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-6 col-12 me-auto mb-5 mb-lg-0">
-                        <a class="navbar-brand d-flex align-items-center" href="{% url 'homepage' %}">
-                            <img src="{% firstof media.site_logo.image_url logo_fallback %}" class="navbar-brand-image img-fluid editable-image" alt="logo" data-key="site_logo">
-                            <span class="navbar-brand-text">
-                                <span class="editable" data-key="site_brand">{{ content.site_brand|default:"Your Brand" }}</span>
-                                <small class="editable" data-key="site_tagline">{{ content.site_tagline|default:"Your Tagline" }}</small>
-                            </span>
-                        </a>
-                    </div>
-                    <div class="col-lg-3 col-12">
-                        <h5 class="site-footer-title mb-4 editable" data-key="footer_join_title">{{ content.footer_join_title|default:"Business Hours" }}</h5>
-                        <p class="d-flex border-bottom pb-3 mb-3 me-lg-3"><span class="editable" data-key="footer_weekday_label">{{ content.footer_weekday_label|default:"Mon-Fri" }}</span><span class="ms-auto editable" data-key="footer_weekday_hours">{{ content.footer_weekday_hours|default:"8:00 AM - 5:00 PM" }}</span></p>
-                        <p class="d-flex me-lg-3"><span class="editable" data-key="footer_weekend_label">{{ content.footer_weekend_label|default:"Sat-Sun" }}</span><span class="ms-auto editable" data-key="footer_weekend_hours">{{ content.footer_weekend_hours|default:"Closed" }}</span></p>
-                        <br>
-                        <p class="copyright-text editable" data-key="footer_copyright">{{ content.footer_copyright|default:"Copyright © 2026 Your Brand" }}</p>
-                    </div>
-                    <div class="col-lg-2 col-12 ms-auto">
-                        <h6 class="text-white editable" data-key="social_section_title">{{ content.social_section_title|default:"Follow Us" }}</h6>
-                        <ul class="social-icon mt-lg-5 mt-3 mb-4">
-                            {% for social in socials %}
-                                <li class="social-icon-item">
-                                    <a href="{{ social.url|default:'#' }}" class="social-icon-link {{ social.icon_class|default:'bi-link-45deg' }} editable-link" data-social-id="{{ social.id }}" data-name="{{ social.name|default:'' }}" data-url="{{ social.url|default:'' }}" data-icon="{{ social.icon_class|default:'' }}" title="{{ social.name|default:'' }}"></a>
-                                </li>
-                            {% empty %}
-                                <li class="text-white editable" data-key="social_empty">{{ content.social_empty|default:"No social links configured." }}</li>
-                            {% endfor %}
-                        </ul>
-                        <p class="copyright-text editable" data-key="footer_credit">{{ content.footer_credit|default:"Design: TemplateMo. Distributed by ThemeWagon" }}</p>
+                        {% empty %}
+                            <div class="ratio ratio-16x9"><div class="d-flex justify-content-center align-items-center bg-dark text-white rounded h-100"><span class="editable" data-key="hero_video_placeholder">{{ content.hero_video_placeholder|default:"No video selected" }}</span></div></div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#81B29A" fill-opacity="1" d="M0,224L34.3,192C68.6,160,137,96,206,90.7C274.3,85,343,139,411,144C480,149,549,107,617,122.7C685.7,139,754,213,823,240C891.4,267,960,245,1029,224C1097.1,203,1166,181,1234,160C1302.9,139,1371,117,1406,106.7L1440,96L1440,320L1405.7,320C1371.4,320,1303,320,1234,320C1165.7,320,1097,320,1029,320C960,320,891,320,823,320C754.3,320,686,320,617,320C548.6,320,480,320,411,320C342.9,320,274,320,206,320C137.1,320,69,320,34,320L0,320Z"></path></svg>
-        </footer>
-
-        <div id="cms-context-menu" class="cms-context-menu shadow-sm">
-            <button type="button" class="dropdown-item" data-action="edit-text">Edit Text</button>
-            <button type="button" class="dropdown-item" data-action="change-image">Change Image</button>
-            <button type="button" class="dropdown-item" data-action="change-video">Change Video</button>
-            <button type="button" class="dropdown-item" data-action="edit-link">Edit Link</button>
         </div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#ffffff" fill-opacity="1" d="M0,224L34.3,192C68.6,160,137,96,206,90.7C274.3,85,343,139,411,144C480,149,549,107,617,122.7C685.7,139,754,213,823,240C891.4,267,960,245,1029,224C1097.1,203,1166,181,1234,160C1302.9,139,1371,117,1406,106.7L1440,96L1440,320L1405.7,320C1371.4,320,1303,320,1234,320C1165.7,320,1097,320,1029,320C960,320,891,320,823,320C754.3,320,686,320,617,320C548.6,320,480,320,411,320C342.9,320,274,320,206,320C137.1,320,69,320,34,320L0,320Z"></path></svg>
+    </section>
 
-        <div class="modal fade" id="textEditorModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header"><h5 class="modal-title">Edit Text</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-                    <div class="modal-body"><textarea id="textEditorInput" class="form-control" rows="6"></textarea></div>
-                    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-primary" id="saveTextButton">Save</button></div>
+    <section class="about-section section-padding" id="section_2">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-12 text-center"><h2 class="mb-lg-5 mb-4 editable" data-key="about_section_title">{{ content.about_section_title|default:"About InnoWorks Studio" }}</h2></div>
+                <div class="col-lg-5 col-12 me-auto mb-4 mb-lg-0">
+                    <h3 class="mb-3 editable" data-key="about_history_title">{{ content.about_history_title|default:"Strategy, design, and delivery under one roof" }}</h3>
+                    <p class="editable" data-key="about_history_body">{{ content.about_history_body|default:"We help service businesses turn outdated websites, scattered tools, and slow manual processes into clear digital systems that customers can trust." }}</p>
+                    <p class="editable" data-key="about_history_body_two">{{ content.about_history_body_two|default:"Our team plans, launches, and maintains conversion-focused pages, CRM workflows, and practical content campaigns without adding complexity to your day." }}</p>
+                </div>
+                <div class="col-lg-3 col-md-6 col-12 mb-4 mb-lg-0 mb-md-0">
+                    <div class="member-block"><div class="member-block-image-wrap"><img src="{% firstof media.founder_image.image_url founder_fallback %}" class="member-block-image img-fluid editable-image" alt="Founder" data-key="founder_image"></div><div class="member-block-info d-flex align-items-center"><h4 class="editable" data-key="founder_name">{{ content.founder_name|default:"Maya Johnson" }}</h4><p class="ms-auto editable" data-key="founder_role">{{ content.founder_role|default:"Founder / Strategy Lead" }}</p></div></div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-12">
+                    <div class="member-block"><div class="member-block-image-wrap"><img src="{% firstof media.cofounder_image.image_url cofounder_fallback %}" class="member-block-image img-fluid editable-image" alt="Operations lead" data-key="cofounder_image"></div><div class="member-block-info d-flex align-items-center"><h4 class="editable" data-key="cofounder_name">{{ content.cofounder_name|default:"Daniel Kim" }}</h4><p class="ms-auto editable" data-key="cofounder_role">{{ content.cofounder_role|default:"Operations Lead" }}</p></div></div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <div class="modal fade" id="videoEditorModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header"><h5 class="modal-title">Update Video</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-                    <div class="modal-body">
-                        <div class="mb-3"><label class="form-label">Upload video file</label><input type="file" id="videoFileInput" class="form-control" accept="video/*"></div>
-                        <div class="text-center text-muted my-2">or</div>
-                        <div><label class="form-label">Paste YouTube URL</label><input type="url" id="youtubeUrlInput" class="form-control" placeholder="https://www.youtube.com/watch?v=..."></div>
+    <section class="section-bg-image">
+        <svg viewBox="0 0 1265 144" xmlns="http://www.w3.org/2000/svg"><path fill="rgba(255, 255, 255, 1)" d="M 0 40 C 164 40 164 20 328 20 L 328 20 L 328 0 L 0 0 Z"></path><path fill="rgba(255, 255, 255, 1)" d="M 327 20 C 445.5 20 445.5 89 564 89 L 564 89 L 564 0 L 327 0 Z"></path><path fill="rgba(255, 255, 255, 1)" d="M 563 89 C 724.5 89 724.5 48 886 48 L 886 48 L 886 0 L 563 0 Z"></path><path fill="rgba(255, 255, 255, 1)" d="M 885 48 C 1006.5 48 1006.5 67 1128 67 L 1128 67 L 1128 0 L 885 0 Z"></path><path fill="rgba(255, 255, 255, 1)" d="M 1127 67 C 1196 67 1196 0 1265 0 L 1265 0 L 1265 0 L 1127 0 Z"></path></svg>
+        <div class="container"><div class="row"><div class="col-lg-6 col-12"><div class="section-bg-image-block">
+            <h2 class="mb-lg-3 editable" data-key="newsletter_title">{{ content.newsletter_title|default:"Get growth notes" }}</h2>
+            <p class="editable" data-key="newsletter_body">{{ content.newsletter_body|default:"Monthly ideas on improving your website, customer follow-up, and local marketing systems." }}</p>
+            <form action="#" method="get" class="custom-form mt-lg-4 mt-2" role="form"><div class="input-group input-group-lg"><span class="input-group-text bi-envelope" id="basic-addon1"></span><input type="email" name="email" class="form-control" placeholder="{{ content.newsletter_placeholder|default:'Work email address' }}" data-placeholder-key="newsletter_placeholder" required><button type="submit" class="form-control editable" data-key="newsletter_button">{{ content.newsletter_button|default:"Subscribe" }}</button></div>{% if is_edit_mode %}<small class="editable cms-placeholder-helper" data-key="newsletter_placeholder">{{ content.newsletter_placeholder|default:"Work email address" }}</small>{% endif %}</form>
+        </div></div></div></div>
+        <svg viewBox="0 0 1265 144" xmlns="http://www.w3.org/2000/svg"><path fill="rgba(255, 255, 255, 1)" d="M 0 40 C 164 40 164 20 328 20 L 328 20 L 328 0 L 0 0 Z"></path><path fill="rgba(255, 255, 255, 1)" d="M 327 20 C 445.5 20 445.5 89 564 89 L 564 89 L 564 0 L 327 0 Z"></path><path fill="rgba(255, 255, 255, 1)" d="M 563 89 C 724.5 89 724.5 48 886 48 L 886 48 L 886 0 L 563 0 Z"></path><path fill="rgba(255, 255, 255, 1)" d="M 885 48 C 1006.5 48 1006.5 67 1128 67 L 1128 67 L 1128 0 L 885 0 Z"></path><path fill="rgba(255, 255, 255, 1)" d="M 1127 67 C 1196 67 1196 0 1265 0 L 1265 0 L 1265 0 L 1127 0 Z"></path></svg>
+    </section>
+
+    <section class="testimony-section section-padding" id="section_3">
+        <div class="container">
+            <div class="row"><div class="col-lg-8 col-12 text-center mx-auto mb-lg-5 mb-4"><h2 class="editable" data-key="testimony_section_title">{{ content.testimony_section_title|default:"What Clients Say" }}</h2><p class="editable mb-0" data-key="testimony_section_subtitle">{{ content.testimony_section_subtitle|default:"Real feedback from teams that trust InnoWorks Studio." }}</p></div></div>
+            <div class="row g-4 justify-content-center align-items-stretch">
+                {% for testimonial in testimonials %}
+                    <div class="col-lg-4 col-md-6 col-12">
+                        <div class="testimony-card">
+                            <img src="{% if testimonial.image %}{{ testimonial.image.url }}{% elif forloop.counter|divisibleby:2 %}{{ cofounder_fallback }}{% else %}{{ founder_fallback }}{% endif %}" class="testimony-image img-fluid editable-image" alt="{{ testimonial.name }}" data-model="testimonial" data-id="{{ testimonial.id }}" data-field="image">
+                            <h4 class="mt-4 mb-1 editable" data-model="testimonial" data-id="{{ testimonial.id }}" data-field="name">{{ testimonial.name }}</h4>
+                            <p class="testimony-role editable" data-model="testimonial" data-id="{{ testimonial.id }}" data-field="role">{{ testimonial.role }}</p>
+                            <a href="{{ testimonial.whatsapp_url|default:'#' }}" target="_blank" rel="noopener" class="testimony-whatsapp-link" data-url-key="testimonial-{{ testimonial.id }}-whatsapp"><i class="bi-whatsapp"></i><span>{{ content.testimony_one_contact_label|default:"Chat on WhatsApp" }}</span></a>
+                            {% if is_edit_mode %}<small class="testimony-url editable" data-model="testimonial" data-id="{{ testimonial.id }}" data-field="whatsapp_url">{{ testimonial.whatsapp_url }}</small>{% endif %}
+                            <p class="testimony-text editable" data-model="testimonial" data-id="{{ testimonial.id }}" data-field="quote">{{ testimonial.quote }}</p>
+                            <div class="testimony-stars" aria-label="Rated {{ testimonial.rating }}/5"><i class="bi-star-fill"></i><i class="bi-star-fill"></i><i class="bi-star-fill"></i><i class="bi-star-fill"></i><i class="bi-star-fill"></i></div>
+                            <small class="testimony-rating">Rated {{ testimonial.rating }}/5</small>
+                        </div>
                     </div>
-                    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-primary" id="saveVideoButton">Save</button></div>
-                </div>
+                {% endfor %}
             </div>
         </div>
+    </section>
 
-        <div class="modal fade" id="linkEditorModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header"><h5 class="modal-title">Edit Social Link</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-                    <div class="modal-body">
-                        <div class="mb-3"><label class="form-label">Name</label><input type="text" id="socialNameInput" class="form-control"></div>
-                        <div class="mb-3"><label class="form-label">URL</label><input type="url" id="socialUrlInput" class="form-control"></div>
-                        <div><label class="form-label">Bootstrap Icon Class</label><input type="text" id="socialIconInput" class="form-control" placeholder="bi-instagram"></div>
+    <section class="events-section section-bg section-padding" id="section_4">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-12"><h2 class="mb-lg-3 editable" data-key="events_title">{{ content.events_title|default:"Latest Insights" }}</h2></div>
+                {% for event in featured_events %}
+                    <div class="row custom-block {% cycle '' 'custom-block-bg' %} mb-3">
+                        <div class="col-lg-2 col-md-4 col-12 order-2 order-md-0 order-lg-0"><div class="custom-block-date-wrap d-flex d-lg-block d-md-block align-items-center mt-3 mt-lg-0 mt-md-0"><h6 class="custom-block-date mb-lg-1 mb-0 me-3 me-lg-0 me-md-0 editable" data-model="event" data-id="{{ event.id }}" data-field="day">{{ event.day }}</h6><strong class="text-white editable" data-model="event" data-id="{{ event.id }}" data-field="month">{{ event.month }}</strong></div></div>
+                        <div class="col-lg-4 col-md-8 col-12 order-1 order-lg-0"><div class="custom-block-image-wrap"><a href="{% url 'details' %}"><img src="{% if event.image %}{{ event.image.url }}{% elif forloop.first %}{{ event_one_fallback }}{% else %}{{ event_two_fallback }}{% endif %}" class="custom-block-image img-fluid editable-image" alt="{{ event.title }}" data-model="event" data-id="{{ event.id }}" data-field="image"><i class="custom-block-icon bi-link"></i></a></div></div>
+                        <div class="col-lg-6 col-12 order-3 order-lg-0"><div class="custom-block-info mt-2 mt-lg-0"><a href="{% url 'details' %}" class="events-title mb-3 editable" data-model="event" data-id="{{ event.id }}" data-field="title">{{ event.title }}</a><p class="mb-0 editable" data-model="event" data-id="{{ event.id }}" data-field="summary">{{ event.summary }}</p><div class="d-flex flex-wrap border-top mt-4 pt-3"><div class="mb-4 mb-lg-0"><div class="d-flex flex-wrap align-items-center mb-1"><span class="custom-block-span editable" data-key="detail_location_label">{{ content.detail_location_label|default:"Location:" }}</span><p class="mb-0 editable ms-2" data-model="event" data-id="{{ event.id }}" data-field="location">{{ event.location }}</p></div><div class="d-flex flex-wrap align-items-center"><span class="custom-block-span editable" data-model="event" data-id="{{ event.id }}" data-field="info_label">{{ event.info_label|default:"Info:" }}</span><p class="mb-0 editable ms-2" data-model="event" data-id="{{ event.id }}" data-field="info">{{ event.info }}</p></div></div><div class="d-flex align-items-center ms-lg-auto"><a href="{% url 'details' %}" class="btn custom-btn editable" data-model="event" data-id="{{ event.id }}" data-field="button_text">{{ event.button_text|default:"Learn More" }}</a></div></div></div></div>
                     </div>
-                    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-primary" id="saveSocialButton">Save</button></div>
-                </div>
+                {% endfor %}
             </div>
         </div>
+    </section>
 
-        <input type="file" id="imageFileInput" accept="image/*" hidden>
-        <div class="toast-container position-fixed bottom-0 end-0 p-3">
-            <div id="cmsToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="d-flex"><div class="toast-body">Saved successfully</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>
-            </div>
-        </div>
-
-        <script src="{% static 'js/jquery.min.js' %}"></script>
-        <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-        <script src="{% static 'js/jquery.sticky.js' %}"></script>
-        <script src="{% static 'js/click-scroll.js' %}"></script>
-        <script src="{% static 'js/animated-headline.js' %}"></script>
-        <script src="{% static 'js/modernizr.js' %}"></script>
-        <script src="{% static 'js/custom.js' %}"></script>
-        <script src="{% static 'js/cms-editor.js' %}"></script>
-    </body>
-</html>
+    <section class="contact-section section-padding" id="section_5">
+        <div class="container"><div class="row"><div class="col-lg-5 col-12"><form action="#" method="post" class="custom-form contact-form" role="form">
+            <h2 class="mb-4 pb-2 editable" data-key="contact_title">{{ content.contact_title|default:"Start a Project" }}</h2>
+            <div class="row"><div class="col-lg-6 col-md-6 col-12"><div class="form-floating"><input type="text" class="form-control" placeholder="{{ content.contact_name_label|default:'Full Name' }}" data-placeholder-key="contact_name_label" required><label class="editable" data-key="contact_name_label">{{ content.contact_name_label|default:"Full Name" }}</label></div></div><div class="col-lg-6 col-md-6 col-12"><div class="form-floating"><input type="email" class="form-control" placeholder="{{ content.contact_email_label|default:'Email address' }}" data-placeholder-key="contact_email_label" required><label class="editable" data-key="contact_email_label">{{ content.contact_email_label|default:"Email address" }}</label></div></div><div class="col-lg-12 col-12"><div class="form-floating"><textarea class="form-control" placeholder="{{ content.contact_message_label|default:'Message' }}" data-placeholder-key="contact_message_label"></textarea><label class="editable" data-key="contact_message_label">{{ content.contact_message_label|default:"Message" }}</label></div><button type="submit" class="form-control editable" data-key="contact_submit">{{ content.contact_submit|default:"Send Message" }}</button></div></div>
+        </form></div><div class="col-lg-6 col-12"><div class="contact-info mt-5"><div class="contact-info-item"><div class="contact-info-body"><strong class="editable" data-key="contact_location">{{ content.contact_location|default:"Innovation House, Dar es Salaam" }}</strong><p class="mt-2 mb-1"><a href="tel:+255700123456" class="contact-link editable" data-key="contact_phone">{{ content.contact_phone|default:"+255 700 123 456" }}</a></p><p class="mb-0"><a href="mailto:{{ content.contact_email|default:'hello@innoworks.example' }}" class="contact-link editable" data-key="contact_email">{{ content.contact_email|default:"hello@innoworks.example" }}</a></p></div><div class="contact-info-footer"><a href="#" class="editable" data-key="contact_directions">{{ content.contact_directions|default:"Directions" }}</a></div></div><img src="{% firstof media.contact_map.image_url contact_map_fallback %}" class="img-fluid editable-image" alt="Map" data-key="contact_map"></div></div></div></div>
+    </section>
+{% endblock %}

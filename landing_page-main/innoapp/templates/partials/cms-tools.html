@@ -1,0 +1,51 @@
+<div id="cms-context-menu" class="cms-context-menu shadow-sm">
+    <button type="button" class="dropdown-item" data-action="edit-text">Edit Text</button>
+    <button type="button" class="dropdown-item" data-action="change-image">Change Image</button>
+    <button type="button" class="dropdown-item" data-action="change-video">Change Video</button>
+    <button type="button" class="dropdown-item" data-action="edit-link">Edit Link</button>
+</div>
+
+<div class="modal fade" id="textEditorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Edit Text</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body"><textarea id="textEditorInput" class="form-control" rows="6"></textarea></div>
+            <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-primary" id="saveTextButton">Save</button></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="videoEditorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Update Video</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <label class="form-label">Upload video file</label>
+                <input type="file" id="videoFileInput" class="form-control" accept="video/*">
+                <small class="text-muted d-block mt-2">Uploaded files are used for site videos. External video URLs are disabled.</small>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-primary" id="saveVideoButton">Save</button></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="linkEditorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Edit Social Link</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="mb-3"><label class="form-label">Name</label><input type="text" id="socialNameInput" class="form-control"></div>
+                <div class="mb-3"><label class="form-label">URL</label><input type="url" id="socialUrlInput" class="form-control"></div>
+                <div><label class="form-label">Bootstrap Icon Class</label><input type="text" id="socialIconInput" class="form-control" placeholder="bi-instagram"></div>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-primary" id="saveSocialButton">Save</button></div>
+        </div>
+    </div>
+</div>
+
+<input type="file" id="imageFileInput" accept="image/*" hidden>
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="cmsToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex"><div class="toast-body">Saved successfully</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>
+    </div>
+</div>

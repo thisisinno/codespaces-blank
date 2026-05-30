@@ -7,7 +7,6 @@
     const contextMenu = document.getElementById('cms-context-menu');
     const imageInput = document.getElementById('imageFileInput');
     const videoFileInput = document.getElementById('videoFileInput');
-    const youtubeUrlInput = document.getElementById('youtubeUrlInput');
     const textEditorInput = document.getElementById('textEditorInput');
     const socialNameInput = document.getElementById('socialNameInput');
     const socialUrlInput = document.getElementById('socialUrlInput');
@@ -67,6 +66,12 @@
 
     const hideMenu = () => contextMenu.classList.remove('show');
     const escapeSelector = (value) => window.CSS?.escape ? CSS.escape(value) : value.replace(/"/g, '\\"');
+    const modelSelector = (target) => {
+        if (!target?.dataset.model || !target.dataset.id || !target.dataset.field) {
+            return '';
+        }
+        return `[data-model="${escapeSelector(target.dataset.model)}"][data-id="${escapeSelector(target.dataset.id)}"][data-field="${escapeSelector(target.dataset.field)}"]`;
+    };
 
     const getTargetType = (target) => {
         if (!target) {
@@ -104,7 +109,6 @@
     const openVideoEditor = (target) => {
         currentTarget = target;
         videoFileInput.value = '';
-        youtubeUrlInput.value = '';
         videoEditorModal.show();
     };
 
@@ -231,15 +235,21 @@
     document.getElementById('saveTextButton').addEventListener('click', async () => {
         try {
             const key = currentTarget?.dataset.key;
-            if (!key) {
+            const model = currentTarget?.dataset.model;
+            const id = currentTarget?.dataset.id;
+            const field = currentTarget?.dataset.field;
+            if (!key && (!model || !id || !field)) {
                 return;
             }
             const data = await request('/save-text/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ key, content: textEditorInput.value }),
+                body: JSON.stringify({ key, model, id, field, content: textEditorInput.value }),
             });
-            document.querySelectorAll(`.editable[data-key="${escapeSelector(key)}"]`).forEach((element) => {
+            const targets = data.model
+                ? document.querySelectorAll(`.editable${modelSelector(currentTarget)}`)
+                : document.querySelectorAll(`.editable[data-key="${escapeSelector(key)}"]`);
+            targets.forEach((element) => {
                 if (element.dataset.display === 'pipe-list') {
                     const words = data.content.split('|').map((item) => item.trim()).filter(Boolean);
                     element.innerHTML = words.map((word, index) => `<b class="${index === 0 ? 'is-visible' : ''}">${word}</b>`).join('');
@@ -247,14 +257,19 @@
                     element.textContent = data.content;
                 }
             });
-            document.querySelectorAll(`[data-placeholder-key="${escapeSelector(key)}"]`).forEach((field) => {
-                field.placeholder = data.content;
-            });
-            document.querySelectorAll(`[data-url-key="${escapeSelector(key)}"]`).forEach((link) => {
-                if (/^https?:\/\//i.test(data.content.trim())) {
-                    link.href = data.content.trim();
-                }
-            });
+            if (key) {
+                document.querySelectorAll(`[data-placeholder-key="${escapeSelector(key)}"]`).forEach((field) => {
+                    field.placeholder = data.content;
+                });
+                document.querySelectorAll(`[data-url-key="${escapeSelector(key)}"]`).forEach((link) => {
+                    if (/^https?:\/\//i.test(data.content.trim())) {
+                        link.href = data.content.trim();
+                    }
+                });
+            }
+            if (data.model === 'testimonial' && data.field === 'whatsapp_url' && /^https?:\/\//i.test(data.content.trim())) {
+                currentTarget.closest('.testimony-card')?.querySelector('.testimony-whatsapp-link')?.setAttribute('href', data.content.trim());
+            }
             textEditorModal.hide();
             showToast('Saved successfully');
         } catch (error) {
@@ -268,10 +283,19 @@
                 return;
             }
             const formData = new FormData();
-            formData.append('key', currentTarget.dataset.key);
+            if (currentTarget.dataset.model) {
+                formData.append('model', currentTarget.dataset.model);
+                formData.append('id', currentTarget.dataset.id);
+                formData.append('field', currentTarget.dataset.field);
+            } else {
+                formData.append('key', currentTarget.dataset.key);
+            }
             formData.append('file', imageInput.files[0]);
             const data = await request('/upload-image/', { method: 'POST', body: formData });
-            document.querySelectorAll(`.editable-image[data-key="${data.key}"]`).forEach((img) => {
+            const targets = data.model
+                ? document.querySelectorAll(`.editable-image[data-model="${escapeSelector(data.model)}"][data-id="${escapeSelector(data.id)}"][data-field="${escapeSelector(data.field)}"]`)
+                : document.querySelectorAll(`.editable-image[data-key="${data.key}"]`);
+            targets.forEach((img) => {
                 img.src = data.image_url;
             });
             showToast('Saved successfully');
@@ -285,22 +309,20 @@
             if (!currentTarget) {
                 return;
             }
-            const key = currentTarget.dataset.key;
             if (videoFileInput.files.length) {
                 const formData = new FormData();
-                formData.append('key', key);
+                if (currentTarget.dataset.model) {
+                    formData.append('model', currentTarget.dataset.model);
+                    formData.append('id', currentTarget.dataset.id);
+                    formData.append('field', currentTarget.dataset.field);
+                } else {
+                    formData.append('key', currentTarget.dataset.key);
+                }
                 formData.append('file', videoFileInput.files[0]);
                 const data = await request('/upload-video/', { method: 'POST', body: formData });
                 currentTarget.innerHTML = `<video controls class="w-100 h-100 object-fit-cover"><source src="${data.video_url}"></video>`;
-            } else if (youtubeUrlInput.value.trim()) {
-                const data = await request('/update-youtube/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ key, youtube_url: youtubeUrlInput.value.trim() }),
-                });
-                currentTarget.innerHTML = `<iframe src="${data.youtube_embed_url}" title="Hero video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
             } else {
-                throw new Error('Choose a video file or provide a YouTube URL.');
+                throw new Error('Choose a video file.');
             }
             videoEditorModal.hide();
             showToast('Saved successfully');

@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        {% include "partials/head.html" %}
+    </head>
+    <body data-is-staff="{{ is_edit_mode|yesno:'true,false' }}">
+        {% csrf_token %}
+        <main>
+            {% include "partials/navbar.html" %}
+            {% block content %}{% endblock %}
+        </main>
+        {% include "partials/footer.html" %}
+        {% include "partials/cms-tools.html" %}
+        {% include "partials/scripts.html" %}
+    </body>
+</html>

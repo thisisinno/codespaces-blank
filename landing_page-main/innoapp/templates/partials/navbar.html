@@ -1,0 +1,91 @@
+{% load static %}
+{% static 'images/logo.png' as logo_fallback %}
+{% if is_edit_mode %}
+    <div class="edit-mode-badge shadow-sm editable" data-key="edit_mode_badge">{{ content.edit_mode_badge|default:"EDIT MODE ACTIVE" }}</div>
+{% endif %}
+
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'homepage' %}">
+            <img src="{% firstof media.site_logo.image_url logo_fallback %}" class="navbar-brand-image img-fluid editable-image" alt="logo" data-key="site_logo">
+            <span class="navbar-brand-text">
+                <span class="editable" data-key="site_brand">{{ content.site_brand|default:"InnoWorks Studio" }}</span>
+                <small class="editable" data-key="site_tagline">{{ content.site_tagline|default:"Digital Strategy & Growth" }}</small>
+            </span>
+        </a>
+
+        <div class="d-lg-none ms-auto me-3">
+            {% if user.is_authenticated %}
+                <a class="btn custom-btn custom-border-btn editable" href="{% url 'logout' %}" data-key="logout_button">{{ content.logout_button|default:"Logout" }}</a>
+            {% else %}
+                <a class="btn custom-btn custom-border-btn editable" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample" data-key="login_button">{{ content.login_button|default:"Admin Login" }}</a>
+            {% endif %}
+        </div>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-lg-auto">
+                <li class="nav-item"><a class="nav-link editable" href="{% url 'homepage' %}#section_1" data-key="nav_home">{{ content.nav_home|default:"Home" }}</a></li>
+                <li class="nav-item"><a class="nav-link editable" href="{% url 'homepage' %}#section_2" data-key="nav_about">{{ content.nav_about|default:"About" }}</a></li>
+                <li class="nav-item"><a class="nav-link editable" href="{% url 'homepage' %}#section_3" data-key="nav_membership">{{ content.nav_membership|default:"Client Stories" }}</a></li>
+                <li class="nav-item"><a class="nav-link editable" href="{% url 'homepage' %}#section_4" data-key="nav_events">{{ content.nav_events|default:"Insights" }}</a></li>
+                <li class="nav-item"><a class="nav-link editable" href="{% url 'homepage' %}#section_5" data-key="nav_contact">{{ content.nav_contact|default:"Contact" }}</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle editable" href="#" id="navbarLightDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-key="nav_pages">{{ content.nav_pages|default:"Pages" }}</a>
+                    <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="navbarLightDropdownMenuLink">
+                        <li><a class="dropdown-item editable {% if active_page == 'listing' %}active{% endif %}" href="{% url 'list' %}" data-key="nav_event_listing">{{ content.nav_event_listing|default:"Event Listing" }}</a></li>
+                        <li><a class="dropdown-item editable {% if active_page == 'detail' %}active{% endif %}" href="{% url 'details' %}" data-key="nav_event_detail">{{ content.nav_event_detail|default:"Event Detail" }}</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <div class="d-none d-lg-block ms-lg-3">
+                {% if user.is_authenticated %}
+                    <a class="btn custom-btn custom-border-btn editable" href="{% url 'logout' %}" data-key="logout_button">{{ content.logout_button|default:"Logout" }}</a>
+                {% else %}
+                    <a class="btn custom-btn custom-border-btn editable" data-bs-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample" data-key="login_button">{{ content.login_button|default:"Admin Login" }}</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title editable" id="offcanvasExampleLabel" data-key="login_title">{{ content.login_title|default:"Admin Login" }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        <p class="text-white editable" data-key="login_help">{{ content.login_help|default:"Use your Django staff credentials to unlock edit mode." }}</p>
+        <form class="custom-form member-login-form" action="{% url 'login' %}" method="post" role="form">
+            {% csrf_token %}
+            <div class="member-login-form-body">
+                <div class="mb-4">
+                    <label class="form-label mb-2 editable" for="member-login-number" data-key="login_username_label">{{ content.login_username_label|default:"Username" }}</label>
+                    <input type="text" name="username" id="member-login-number" class="form-control" placeholder="admin" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label mb-2 editable" for="member-login-password" data-key="login_password_label">{{ content.login_password_label|default:"Password" }}</label>
+                    <input type="password" name="password" id="member-login-password" class="form-control" placeholder="Password" required>
+                </div>
+                <div class="col-lg-5 col-md-7 col-8 mx-auto">
+                    <button type="submit" class="form-control editable" data-key="login_submit">{{ content.login_submit|default:"Login" }}</button>
+                </div>
+            </div>
+        </form>
+        <div class="mt-auto mb-5">
+            <p>
+                <strong class="text-white me-3 editable" data-key="login_footer_label">{{ content.login_footer_label|default:"Need help?" }}</strong>
+                <a href="mailto:{{ content.login_footer_value|default:'support@example.com' }}" class="contact-link editable" data-key="login_footer_value">{{ content.login_footer_value|default:"support@example.com" }}</a>
+            </p>
+        </div>
+    </div>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#3D405B" fill-opacity="1" d="M0,224L34.3,192C68.6,160,137,96,206,90.7C274.3,85,343,139,411,144C480,149,549,107,617,122.7C685.7,139,754,213,823,240C891.4,267,960,245,1029,224C1097.1,203,1166,181,1234,160C1302.9,139,1371,117,1406,106.7L1440,96L1440,320L1405.7,320C1371.4,320,1303,320,1234,320C1165.7,320,1097,320,1029,320C960,320,891,320,823,320C754.3,320,686,320,617,320C548.6,320,480,320,411,320C342.9,320,274,320,206,320C137.1,320,69,320,34,320L0,320Z"></path></svg>
+</div>

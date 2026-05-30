@@ -1,5 +1,5 @@
 import json
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import urlparse
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -9,7 +9,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
-from .models import MediaContent, PageContent, SocialLink
+from .models import EventInsight, HeroVideo, MediaContent, PageContent, SocialLink, Testimonial
 
 
 DEFAULT_PAGE_CONTENT = {
@@ -105,6 +105,20 @@ DEFAULT_PAGE_CONTENT = {
     "contact_email_label": "Email address",
     "contact_message_label": "Message",
     "social_empty": "No social links configured.",
+    "listing_page_title": "Insights & Updates",
+    "listing_page_cta": "Explore Insights",
+    "listing_featured_title": "Featured Work",
+    "listing_upcoming_title": "Latest Business Insights",
+    "detail_page_title": "Insight Detail",
+    "detail_page_cta": "Learn More",
+    "detail_section_title": "Digital growth system for service teams",
+    "detail_intro_title": "Clear websites, faster follow-up, better customer journeys",
+    "detail_intro_body": "This featured insight shows how a focused digital improvement plan can help a business replace scattered tools with a landing page, lead capture flow, and simple reporting rhythm.",
+    "detail_intro_body_two": "Use this page to explain a signature service, client result, workshop, or announcement. Staff can edit every visible block without changing template code.",
+    "detail_info_title": "Project Detail",
+    "detail_date_label": "Date:",
+    "detail_location_label": "Location:",
+    "detail_info_label": "Info:",
 }
 
 GENERIC_DEFAULT_PAGE_CONTENT = {
@@ -199,9 +213,103 @@ LEGACY_DEFAULT_PAGE_CONTENT = {
     "footer_copyright": "Copyright © 2048 Tiya Golf Club",
 }
 
-DEFAULT_MEDIA = {
-    "hero_video": {"youtube_url": "https://www.youtube.com/watch?v=MGNgbNGOzh8"},
-}
+DEFAULT_MEDIA = {}
+
+DEFAULT_HERO_VIDEOS = [
+    {
+        "title": "Digital systems overview",
+        "sort_order": 1,
+        "is_active": True,
+    },
+    {
+        "title": "Client workflow walkthrough",
+        "sort_order": 2,
+        "is_active": True,
+    },
+    {
+        "title": "Analytics review demo",
+        "sort_order": 3,
+        "is_active": True,
+    },
+]
+
+DEFAULT_TESTIMONIALS = [
+    {
+        "name": "Amina Carter",
+        "role": "Operations Director",
+        "quote": "InnoWorks rebuilt our landing page and connected every inquiry to a simple follow-up workflow. We started replying faster and booking better-fit consultations within the first month.",
+        "rating": 5,
+        "whatsapp_url": "https://wa.me/255700000000",
+        "sort_order": 1,
+        "is_active": True,
+    },
+    {
+        "name": "Peter Mwangi",
+        "role": "Founder",
+        "quote": "The team made our services easy to understand online. The new content, forms, and WhatsApp calls-to-action gave customers a much clearer path to contact us.",
+        "rating": 5,
+        "whatsapp_url": "https://wa.me/255700000001",
+        "sort_order": 2,
+        "is_active": True,
+    },
+    {
+        "name": "Sarah Bennett",
+        "role": "Managing Partner",
+        "quote": "They handled the details we never had time for: page copy, images, analytics, and lead routing. The site finally feels current and useful.",
+        "rating": 5,
+        "whatsapp_url": "https://wa.me/255700000002",
+        "sort_order": 3,
+        "is_active": True,
+    },
+]
+
+DEFAULT_EVENTS = [
+    {
+        "title": "Conversion audit package",
+        "summary": "A focused review of your homepage, forms, analytics, and follow-up flow with a prioritized action list.",
+        "body": "Our conversion audit gives growing service teams a practical plan for improving the pages and follow-up steps that turn visitors into qualified conversations. We review message clarity, form friction, analytics visibility, mobile experience, and response workflows.",
+        "day": "24",
+        "month": "Jan 2026",
+        "date_text": "24 Jan 2026",
+        "location": "Online consultation",
+        "info_label": "Info:",
+        "info": "Limited monthly slots",
+        "button_text": "Learn More",
+        "sort_order": 1,
+        "is_featured": True,
+        "is_active": True,
+    },
+    {
+        "title": "CRM cleanup sprint",
+        "summary": "A two-week sprint to organize contacts, lead stages, automated replies, and team visibility.",
+        "body": "This sprint helps teams regain control of messy customer data. We simplify lead stages, remove duplicate noise, set up useful reminders, and make sure every new inquiry has a clear next step.",
+        "day": "28",
+        "month": "Jan 2026",
+        "date_text": "28 Jan 2026",
+        "location": "Remote delivery",
+        "info_label": "Info:",
+        "info": "Two-week sprint",
+        "button_text": "Learn More",
+        "sort_order": 2,
+        "is_featured": True,
+        "is_active": True,
+    },
+    {
+        "title": "Local search content refresh",
+        "summary": "A business-ready content refresh for service pages, FAQs, and stronger local discovery.",
+        "body": "We update your most important service content so prospects can quickly understand what you do, who you help, and how to contact you. The work includes page copy, structured FAQs, and practical calls-to-action.",
+        "day": "03",
+        "month": "Feb 2026",
+        "date_text": "03 Feb 2026",
+        "location": "Remote delivery",
+        "info_label": "Info:",
+        "info": "Content package",
+        "button_text": "View Detail",
+        "sort_order": 3,
+        "is_featured": False,
+        "is_active": True,
+    },
+]
 
 DEFAULT_SOCIAL_LINKS = [
     {"name": "Instagram", "url": "https://instagram.com", "icon_class": "bi-instagram"},
@@ -220,20 +328,22 @@ IMAGE_KEYS = {
     "testimony_two_image",
     "testimony_three_image",
 }
-VIDEO_KEYS = {"hero_video"}
+VIDEO_KEYS = set()
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"}
 ALLOWED_VIDEO_TYPES = {"video/mp4", "video/webm", "video/ogg", "video/quicktime"}
-
-
-def _youtube_embed_url(url):
-    if not url:
-        return ""
-    parsed = urlparse(url)
-    if "youtu.be" in parsed.netloc:
-        video_id = parsed.path.strip("/")
-    else:
-        video_id = parse_qs(parsed.query).get("v", [""])[0]
-    return f"https://www.youtube.com/embed/{video_id}" if video_id else url
+TEXT_MODEL_FIELDS = {
+    "testimonial": (Testimonial, {"name", "role", "quote", "whatsapp_url"}),
+    "event": (EventInsight, {"title", "summary", "body", "day", "month", "date_text", "location", "info_label", "info", "button_text"}),
+    "hero_video": (HeroVideo, {"title"}),
+}
+IMAGE_MODEL_FIELDS = {
+    "testimonial": (Testimonial, {"image"}),
+    "event": (EventInsight, {"image"}),
+    "hero_video": (HeroVideo, {"poster"}),
+}
+VIDEO_MODEL_FIELDS = {
+    "hero_video": (HeroVideo, {"video"}),
+}
 
 
 def _safe_external_url(url, fallback):
@@ -247,8 +357,8 @@ def _media_payload(instance):
     return {
         "image_url": instance.image.url if instance and instance.image else "",
         "video_url": instance.video.url if instance and instance.video else "",
-        "youtube_url": instance.youtube_url if instance else "",
-        "youtube_embed_url": _youtube_embed_url(instance.youtube_url if instance else ""),
+        "youtube_url": "",
+        "youtube_embed_url": "",
     }
 
 
@@ -265,6 +375,34 @@ def _ensure_defaults():
         MediaContent.objects.get_or_create(key=key, defaults=value)
     for social in DEFAULT_SOCIAL_LINKS:
         SocialLink.objects.get_or_create(name=social["name"], defaults=social)
+    for item in DEFAULT_HERO_VIDEOS:
+        HeroVideo.objects.get_or_create(sort_order=item["sort_order"], defaults=item)
+    if not Testimonial.objects.exists():
+        for item in DEFAULT_TESTIMONIALS:
+            Testimonial.objects.create(**item)
+    if not EventInsight.objects.exists():
+        for item in DEFAULT_EVENTS:
+            EventInsight.objects.create(**item)
+
+
+def _shared_context(request):
+    _ensure_defaults()
+    content_dict = {item.key: item.content for item in PageContent.objects.all()}
+    media_dict = {item.key: _media_payload(item) for item in MediaContent.objects.all()}
+    events = EventInsight.objects.filter(is_active=True).order_by("sort_order", "id")
+    featured_events = events.filter(is_featured=True)
+    return {
+        "content": content_dict,
+        "media": media_dict,
+        "socials": SocialLink.objects.all().order_by("id"),
+        "is_edit_mode": request.user.is_staff,
+        "hero_words": [word.strip() for word in content_dict.get("hero_rotating_words", "Reliable|Professional|Trusted").split("|") if word.strip()],
+        "hero_videos": HeroVideo.objects.filter(is_active=True).order_by("sort_order", "id"),
+        "testimonials": Testimonial.objects.filter(is_active=True).order_by("sort_order", "id"),
+        "events": events,
+        "featured_events": featured_events,
+        "detail_event": events.first(),
+    }
 
 
 def _staff_required(request):
@@ -273,32 +411,30 @@ def _staff_required(request):
     return None
 
 
+def _model_instance(model_name, object_id, registry, field_name):
+    model_config = registry.get(model_name)
+    if not model_config:
+        return None, JsonResponse({"error": "Invalid editable item."}, status=400)
+    model_class, allowed_fields = model_config
+    if field_name not in allowed_fields:
+        return None, JsonResponse({"error": "Invalid editable field."}, status=400)
+    return get_object_or_404(model_class, id=object_id), None
+
+
 def homepage(request):
-    _ensure_defaults()
-    content_dict = {item.key: item.content for item in PageContent.objects.all()}
-    media_dict = {item.key: _media_payload(item) for item in MediaContent.objects.all()}
-    testimony_links = {
-        "one": _safe_external_url(content_dict.get("testimony_one_whatsapp_url"), DEFAULT_PAGE_CONTENT["testimony_one_whatsapp_url"]),
-        "two": _safe_external_url(content_dict.get("testimony_two_whatsapp_url"), DEFAULT_PAGE_CONTENT["testimony_two_whatsapp_url"]),
-        "three": _safe_external_url(content_dict.get("testimony_three_whatsapp_url"), DEFAULT_PAGE_CONTENT["testimony_three_whatsapp_url"]),
-    }
-    context = {
-        "content": content_dict,
-        "media": media_dict,
-        "socials": SocialLink.objects.all().order_by("id"),
-        "is_edit_mode": request.user.is_staff,
-        "testimony_links": testimony_links,
-        "hero_words": [word.strip() for word in content_dict.get("hero_rotating_words", "Reliable|Professional|Trusted").split("|") if word.strip()],
-    }
-    return render(request, "index.html", context)
+    return render(request, "index.html", _shared_context(request))
 
 
 def details(request):
-    return render(request, "event-detail.html")
+    context = _shared_context(request)
+    context["active_page"] = "detail"
+    return render(request, "event-detail.html", context)
 
 
 def event_list(request):
-    return render(request, "event-listing.html")
+    context = _shared_context(request)
+    context["active_page"] = "listing"
+    return render(request, "event-listing.html", context)
 
 
 @require_POST
@@ -326,6 +462,24 @@ def save_text(request):
     if staff_error:
         return staff_error
     payload = json.loads(request.body.decode("utf-8"))
+    model_name = payload.get("model")
+    object_id = payload.get("id")
+    field_name = payload.get("field")
+    if model_name or object_id or field_name:
+        value = payload.get("content", "")
+        instance, error = _model_instance(model_name, object_id, TEXT_MODEL_FIELDS, field_name)
+        if error:
+            return error
+        setattr(instance, field_name, value)
+        instance.save(update_fields=[field_name])
+        return JsonResponse({
+            "success": True,
+            "model": model_name,
+            "id": object_id,
+            "field": field_name,
+            "content": value,
+        })
+
     key = payload.get("key")
     value = payload.get("content")
     if not key:
@@ -342,7 +496,27 @@ def upload_image(request):
     if staff_error:
         return staff_error
     key = request.POST.get("key")
+    model_name = request.POST.get("model")
+    object_id = request.POST.get("id")
+    field_name = request.POST.get("field")
     file = request.FILES.get("file")
+    if model_name or object_id or field_name:
+        if not file or file.content_type not in ALLOWED_IMAGE_TYPES:
+            return JsonResponse({"error": "Unsupported image type."}, status=400)
+        instance, error = _model_instance(model_name, object_id, IMAGE_MODEL_FIELDS, field_name)
+        if error:
+            return error
+        setattr(instance, field_name, file)
+        instance.save(update_fields=[field_name])
+        image_field = getattr(instance, field_name)
+        return JsonResponse({
+            "success": True,
+            "model": model_name,
+            "id": object_id,
+            "field": field_name,
+            "image_url": image_field.url,
+        })
+
     if not key or key not in IMAGE_KEYS:
         return JsonResponse({"error": "Invalid image key."}, status=400)
     if not file or file.content_type not in ALLOWED_IMAGE_TYPES:
@@ -359,7 +533,27 @@ def upload_video(request):
     if staff_error:
         return staff_error
     key = request.POST.get("key")
+    model_name = request.POST.get("model")
+    object_id = request.POST.get("id")
+    field_name = request.POST.get("field")
     file = request.FILES.get("file")
+    if model_name or object_id or field_name:
+        if not file or file.content_type not in ALLOWED_VIDEO_TYPES:
+            return JsonResponse({"error": "Unsupported video type."}, status=400)
+        instance, error = _model_instance(model_name, object_id, VIDEO_MODEL_FIELDS, field_name)
+        if error:
+            return error
+        setattr(instance, field_name, file)
+        instance.save(update_fields=[field_name])
+        video_field = getattr(instance, field_name)
+        return JsonResponse({
+            "success": True,
+            "model": model_name,
+            "id": object_id,
+            "field": field_name,
+            "video_url": video_field.url,
+        })
+
     if not key or key not in VIDEO_KEYS:
         return JsonResponse({"error": "Invalid video key."}, status=400)
     if not file or file.content_type not in ALLOWED_VIDEO_TYPES:
@@ -376,26 +570,7 @@ def update_youtube(request):
     staff_error = _staff_required(request)
     if staff_error:
         return staff_error
-    payload = json.loads(request.body.decode("utf-8"))
-    key = payload.get("key")
-    youtube_url = payload.get("youtube_url")
-    if not key or key not in VIDEO_KEYS:
-        return JsonResponse({"error": "Invalid video key."}, status=400)
-    validator = URLValidator()
-    try:
-        validator(youtube_url)
-    except Exception:
-        return JsonResponse({"error": "Invalid YouTube URL."}, status=400)
-    item, _ = MediaContent.objects.get_or_create(key=key)
-    item.youtube_url = youtube_url
-    item.video = None
-    item.save()
-    return JsonResponse({
-        "success": True,
-        "key": key,
-        "youtube_url": youtube_url,
-        "youtube_embed_url": _youtube_embed_url(youtube_url),
-    })
+    return JsonResponse({"error": "Video URLs are disabled. Upload a video file instead."}, status=400)
 
 
 @require_POST
